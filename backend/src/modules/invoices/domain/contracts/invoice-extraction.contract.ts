@@ -33,29 +33,44 @@ export type InvoiceComputedMetrics = {
   economiaGdRs: number;
 };
 
-export const INVOICE_EXTRACTION_REFERENCE = {
-  requiredFields: [
-    'numeroCliente',
-    'mesReferencia',
-    'itensFatura.energiaEletrica.quantidadeKwh',
-    'itensFatura.energiaEletrica.valorRs',
-    'itensFatura.energiaSceeSemIcms.quantidadeKwh',
-    'itensFatura.energiaSceeSemIcms.valorRs',
-    'itensFatura.energiaCompensadaGdi.quantidadeKwh',
-    'itensFatura.energiaCompensadaGdi.valorRs',
-    'itensFatura.contribIlumPublicaMunicipal.valorRs',
-  ],
-  businessRules: {
-    consumoEnergiaEletricaKwh:
-      'energiaEletrica.quantidadeKwh + energiaSceeSemIcms.quantidadeKwh',
-    energiaCompensadaKwh: 'energiaCompensadaGdi.quantidadeKwh',
-    valorTotalSemGdRs:
-      'energiaEletrica.valorRs + energiaSceeSemIcms.valorRs + contribIlumPublicaMunicipal.valorRs',
-    economiaGdRs: 'energiaCompensadaGdi.valorRs',
-  },
-} as const;
+export const invoiceExtractionReferenceSchema = z.object({
+  requiredFields: z.array(z.string().min(1)).min(1),
+  businessRules: z.object({
+    consumoEnergiaEletricaKwh: z.string().min(1),
+    energiaCompensadaKwh: z.string().min(1),
+    valorTotalSemGdRs: z.string().min(1),
+    economiaGdRs: z.string().min(1),
+  }),
+});
 
-export const INVOICE_EXTRACTION_PROMPT = `
+export type InvoiceExtractionReference = z.infer<
+  typeof invoiceExtractionReferenceSchema
+>;
+
+export const DEFAULT_INVOICE_EXTRACTION_REFERENCE: InvoiceExtractionReference =
+  {
+    requiredFields: [
+      'numeroCliente',
+      'mesReferencia',
+      'itensFatura.energiaEletrica.quantidadeKwh',
+      'itensFatura.energiaEletrica.valorRs',
+      'itensFatura.energiaSceeSemIcms.quantidadeKwh',
+      'itensFatura.energiaSceeSemIcms.valorRs',
+      'itensFatura.energiaCompensadaGdi.quantidadeKwh',
+      'itensFatura.energiaCompensadaGdi.valorRs',
+      'itensFatura.contribIlumPublicaMunicipal.valorRs',
+    ],
+    businessRules: {
+      consumoEnergiaEletricaKwh:
+        'energiaEletrica.quantidadeKwh + energiaSceeSemIcms.quantidadeKwh',
+      energiaCompensadaKwh: 'energiaCompensadaGdi.quantidadeKwh',
+      valorTotalSemGdRs:
+        'energiaEletrica.valorRs + energiaSceeSemIcms.valorRs + contribIlumPublicaMunicipal.valorRs',
+      economiaGdRs: 'energiaCompensadaGdi.valorRs',
+    },
+  };
+
+export const DEFAULT_INVOICE_EXTRACTION_PROMPT = `
 Você é um extrator de dados de fatura de energia. Retorne apenas JSON válido.
 Não invente valores. Se um campo não existir no documento, retorne 0 para campos numéricos e string vazia para texto.
 
@@ -70,6 +85,34 @@ Campos obrigatórios:
 - itensFatura.energiaCompensadaGdi.valorRs
 - itensFatura.contribIlumPublicaMunicipal.valorRs
 `.trim();
+
+export const INVOICE_EXTRACTION_REFERENCE =
+  DEFAULT_INVOICE_EXTRACTION_REFERENCE;
+export const INVOICE_EXTRACTION_PROMPT = DEFAULT_INVOICE_EXTRACTION_PROMPT;
+
+export function resolveInvoiceExtractionReference(
+  rawReference?: string,
+): InvoiceExtractionReference {
+  if (!rawReference) {
+    return DEFAULT_INVOICE_EXTRACTION_REFERENCE;
+  }
+
+  try {
+    const parsedReference = JSON.parse(rawReference) as unknown;
+    return invoiceExtractionReferenceSchema.parse(parsedReference);
+  } catch {
+    return DEFAULT_INVOICE_EXTRACTION_REFERENCE;
+  }
+}
+
+export function resolveInvoiceExtractionPrompt(rawPrompt?: string): string {
+  const prompt = rawPrompt?.trim();
+  if (!prompt) {
+    return DEFAULT_INVOICE_EXTRACTION_PROMPT;
+  }
+
+  return prompt;
+}
 
 export function computeInvoiceMetrics(
   extraction: InvoiceExtraction,

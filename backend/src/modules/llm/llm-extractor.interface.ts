@@ -1,4 +1,4 @@
-import { InvoiceExtraction } from '../invoices/contracts/invoice-extraction.contract';
+import { InvoiceExtraction } from '../invoices/domain/contracts/invoice-extraction.contract';
 
 export type LlmProvider = 'ollama' | 'openai' | 'gemini' | 'claude';
 

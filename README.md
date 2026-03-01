@@ -40,7 +40,7 @@ Variáveis calculadas (regra do desafio):
 
 A referência de extração está centralizada em TypeScript:
 
-- `backend/src/modules/invoices/contracts/invoice-extraction.contract.ts`
+- `backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts`
 
 Nesse arquivo ficam:
 
@@ -122,7 +122,7 @@ Computed metrics:
 
 The extraction is centralized in:
 
-- `backend/src/modules/invoices/contracts/invoice-extraction.contract.ts`
+- `backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts`
 
 This file is the reusable source of truth for:
 
