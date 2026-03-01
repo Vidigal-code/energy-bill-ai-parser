@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Invoice {
+  id                                 String         @id @default(cuid())
+  fileName                           String
+  numeroCliente                      String
+  mesReferencia                      String
+  energiaEletricaQuantidadeKwh       Decimal        @db.Decimal(14, 3)
+  energiaEletricaValorRs             Decimal        @db.Decimal(14, 2)
+  energiaSceeSemIcmsQuantidadeKwh    Decimal        @db.Decimal(14, 3)
+  energiaSceeSemIcmsValorRs          Decimal        @db.Decimal(14, 2)
+  energiaCompensadaGdiQuantidadeKwh  Decimal        @db.Decimal(14, 3)
+  energiaCompensadaGdiValorRs        Decimal        @db.Decimal(14, 2)
+  contribIlumPublicaMunicipalValorRs Decimal        @db.Decimal(14, 2)
+  extractionProvider                 String
+  rawExtractionJson                  Json
+  createdAt                          DateTime       @default(now())
+  updatedAt                          DateTime       @updatedAt
+  metrics                            InvoiceMetrics?
+
+  @@index([numeroCliente])
+  @@index([mesReferencia])
+}
+
+model InvoiceMetrics {
+  id                         String   @id @default(cuid())
+  invoiceId                  String   @unique
+  consumoEnergiaEletricaKwh  Decimal  @db.Decimal(14, 3)
+  energiaCompensadaKwh       Decimal  @db.Decimal(14, 3)
+  valorTotalSemGdRs          Decimal  @db.Decimal(14, 2)
+  economiaGdRs               Decimal  @db.Decimal(14, 2)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  invoice                    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
