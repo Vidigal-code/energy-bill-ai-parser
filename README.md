@@ -86,6 +86,32 @@ Serviços principais:
 - Ollama: `http://localhost:11434`
 - LocalStack (S3): `http://localhost:4566`
 
+## Checklist de validação (escopo backend)
+
+- `npm run lint` em `backend`;
+- `npm run test` em `backend` (unitário + integração);
+- `npm run build` em `backend`;
+- `docker compose up --build` para infraestrutura + API;
+- `docker compose --profile test up --build backend-tests` para testes em container.
+
+## Roteiro de validação prática (fatura)
+
+Com um PDF real do desafio, validar campo a campo:
+
+- `numeroCliente`;
+- `mesReferencia`;
+- `itensFatura.energiaEletrica.{quantidadeKwh,valorRs}`;
+- `itensFatura.energiaSceeSemIcms.{quantidadeKwh,valorRs}`;
+- `itensFatura.energiaCompensadaGdi.{quantidadeKwh,valorRs}`;
+- `itensFatura.contribIlumPublicaMunicipal.valorRs`.
+
+E validar métricas calculadas:
+
+- `consumoEnergiaEletricaKwh`;
+- `energiaCompensadaKwh`;
+- `valorTotalSemGdRs`;
+- `economiaGdRs`.
+
 </details>
 
 <details>
@@ -171,5 +197,31 @@ Main services:
 - PostgreSQL: `localhost:5432`
 - Ollama: `http://localhost:11434`
 - LocalStack (S3): `http://localhost:4566`
+
+## Validation Checklist (backend scope)
+
+- `npm run lint` in `backend`;
+- `npm run test` in `backend` (unit + integration);
+- `npm run build` in `backend`;
+- `docker compose up --build` for infrastructure + API;
+- `docker compose --profile test up --build backend-tests` for containerized tests.
+
+## Practical Invoice Validation Script
+
+Using a real challenge PDF, validate field by field:
+
+- `numeroCliente`;
+- `mesReferencia`;
+- `itensFatura.energiaEletrica.{quantidadeKwh,valorRs}`;
+- `itensFatura.energiaSceeSemIcms.{quantidadeKwh,valorRs}`;
+- `itensFatura.energiaCompensadaGdi.{quantidadeKwh,valorRs}`;
+- `itensFatura.contribIlumPublicaMunicipal.valorRs`.
+
+Then validate computed metrics:
+
+- `consumoEnergiaEletricaKwh`;
+- `energiaCompensadaKwh`;
+- `valorTotalSemGdRs`;
+- `economiaGdRs`.
 
 </details>

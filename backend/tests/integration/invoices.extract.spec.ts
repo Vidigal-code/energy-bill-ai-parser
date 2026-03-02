@@ -87,7 +87,7 @@ describe('Invoices extract (integration)', () => {
           useValue: {
             get: (key: string) => {
               const map: Record<string, unknown> = {
-                PDF_MAX_FILE_SIZE_MB: 50,
+                PDF_MAX_FILE_SIZE_MB: 1,
                 S3_BUCKET: 'energy-bills',
                 OPEN_SOURCE_IA: 'true',
                 LLM_PROVIDER: 'ollama',
@@ -141,5 +141,30 @@ describe('Invoices extract (integration)', () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const response = await request(server).post('/invoices/extract');
     expect(response.status).toBe(400);
+  });
+
+  it('deve retornar 415 quando arquivo não for PDF', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server)
+      .post('/invoices/extract')
+      .attach('file', Buffer.from('plain-text'), {
+        filename: 'nota.txt',
+        contentType: 'text/plain',
+      });
+
+    expect(response.status).toBe(415);
+  });
+
+  it('deve retornar 413 quando PDF exceder limite configurado', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const payload = Buffer.alloc(2 * 1024 * 1024, 'a');
+    const response = await request(server)
+      .post('/invoices/extract')
+      .attach('file', payload, {
+        filename: 'fatura-grande.pdf',
+        contentType: 'application/pdf',
+      });
+
+    expect(response.status).toBe(413);
   });
 });

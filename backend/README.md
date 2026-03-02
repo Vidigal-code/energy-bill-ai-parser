@@ -134,6 +134,35 @@ Endpoints úteis:
 - `GET /api/invoices/dashboard/financial`
 - `GET /api/admin/*` (somente ADMIN)
 
+## Checklist de aceite técnico
+
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `docker compose up --build`
+- `docker compose --profile test up --build backend-tests`
+
+## Roteiro de validação prática da extração
+
+1. Subir stack completa e autenticar usuário.
+2. Enviar PDF real em `POST /api/invoices/extract`.
+3. Validar retorno da extração com os campos:
+   - `numeroCliente`
+   - `mesReferencia`
+   - `itensFatura.energiaEletrica.{quantidadeKwh,valorRs}`
+   - `itensFatura.energiaSceeSemIcms.{quantidadeKwh,valorRs}`
+   - `itensFatura.energiaCompensadaGdi.{quantidadeKwh,valorRs}`
+   - `itensFatura.contribIlumPublicaMunicipal.valorRs`
+4. Confirmar métricas agregadas:
+   - `consumoEnergiaEletricaKwh`
+   - `energiaCompensadaKwh`
+   - `valorTotalSemGdRs`
+   - `economiaGdRs`
+5. Validar persistência:
+   - fatura e métricas no banco;
+   - documento criptografado no storage;
+   - trilha de auditoria com ator, status e meta.
+
 </details>
 
 <details>
@@ -255,24 +284,53 @@ Useful endpoints:
 - `GET /api/invoices/dashboard/financial`
 - `GET /api/admin/*` (ADMIN only)
 
-## Docker (API + infraestrutura + modelo Ollama)
+## Docker (API + infrastructure + Ollama model)
 
-Na raiz do repositório:
+From repository root:
 
 ```bash
 docker compose up --build
 ```
 
-Fluxo de orquestração:
+Orchestration flow:
 
-- `postgres`, `localstack` e `ollama` sobem primeiro;
-- `ollama-init` puxa automaticamente o modelo definido em `OLLAMA_MODEL`;
-- `backend` só inicia depois do pull do modelo e aplica `prisma db push` no startup.
+- `postgres`, `localstack`, and `ollama` start first;
+- `ollama-init` automatically pulls the model defined in `OLLAMA_MODEL`;
+- `backend` starts only after model pull and runs `prisma db push` on startup.
 
-## Docker (testes)
+## Docker (tests)
 
 ```bash
 docker compose --profile test up --build backend-tests
 ```
+
+## Technical Acceptance Checklist
+
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `docker compose up --build`
+- `docker compose --profile test up --build backend-tests`
+
+## Practical Extraction Validation Script
+
+1. Start the full stack and authenticate.
+2. Upload a real PDF to `POST /api/invoices/extract`.
+3. Validate extraction response fields:
+   - `numeroCliente`
+   - `mesReferencia`
+   - `itensFatura.energiaEletrica.{quantidadeKwh,valorRs}`
+   - `itensFatura.energiaSceeSemIcms.{quantidadeKwh,valorRs}`
+   - `itensFatura.energiaCompensadaGdi.{quantidadeKwh,valorRs}`
+   - `itensFatura.contribIlumPublicaMunicipal.valorRs`
+4. Confirm computed metrics:
+   - `consumoEnergiaEletricaKwh`
+   - `energiaCompensadaKwh`
+   - `valorTotalSemGdRs`
+   - `economiaGdRs`
+5. Validate persistence:
+   - invoice and metrics in database;
+   - encrypted document in storage;
+   - audit trail with actor, status, and metadata.
 
 </details>
