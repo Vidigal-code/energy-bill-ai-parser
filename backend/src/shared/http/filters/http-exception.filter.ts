@@ -80,8 +80,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       method: request.method,
       statusCode: status,
       message,
-      error:
-        status === HttpStatus.INTERNAL_SERVER_ERROR ? exception : undefined,
+      error: status === 500 ? exception : undefined,
     });
 
     response.status(status).json(

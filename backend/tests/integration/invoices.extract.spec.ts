@@ -246,10 +246,11 @@ describe('Invoices extract (integration)', () => {
     const response = await request(server).get(
       '/invoices?numeroCliente=7204076116&periodoInicio=fev/2024&periodoFim=fev/2024',
     );
+    const body = response.body as Array<{ mesReferencia?: string }>;
 
     expect(response.status).toBe(200);
-    expect(response.body).toHaveLength(1);
-    expect(response.body[0]?.mesReferencia).toBe('FEV/2024');
+    expect(body).toHaveLength(1);
+    expect(body[0]?.mesReferencia).toBe('FEV/2024');
   });
 
   it('deve retornar 400 quando periodoInicio for maior que periodoFim', async () => {
