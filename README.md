@@ -88,7 +88,8 @@ Serviços principais:
 
 - Frontend: `http://localhost:3001`
 - API: `http://localhost:3000`
-- Swagger: `http://localhost:3000/api/docs`
+- Swagger (Português): `http://localhost:3000/api/docs/pt`
+- Swagger (English): `http://localhost:3000/api/docs/en`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
 - LocalStack (S3): `http://localhost:4566`
@@ -213,7 +214,8 @@ Main services:
 
 - Frontend: `http://localhost:3001`
 - API: `http://localhost:3000`
-- Swagger: `http://localhost:3000/api/docs`
+- Swagger (Português): `http://localhost:3000/api/docs/pt`
+- Swagger (English): `http://localhost:3000/api/docs/en`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
 - LocalStack (S3): `http://localhost:4566`

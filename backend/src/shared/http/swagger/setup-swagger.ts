@@ -12,8 +12,8 @@ export function setupSwagger(input: SetupSwaggerInput): void {
     return;
   }
 
-  const config = new DocumentBuilder()
-    .setTitle('Energy Bill AI Parser API')
+  const configPt = new DocumentBuilder()
+    .setTitle('Plataforma de Faturas de Energia (API)')
     .setDescription(
       'Documentação da API backend para autenticação, processamento de faturas e administração.',
     )
@@ -21,6 +21,18 @@ export function setupSwagger(input: SetupSwaggerInput): void {
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(input.app, config);
-  SwaggerModule.setup(input.path, input.app, document);
+  const documentPt = SwaggerModule.createDocument(input.app, configPt);
+  SwaggerModule.setup('api/docs/pt', input.app, documentPt);
+
+  const configEn = new DocumentBuilder()
+    .setTitle('Energy Bill AI Parser API')
+    .setDescription(
+      'Backend API documentation for authentication, invoice processing, and administration.',
+    )
+    .setVersion('1.0.0')
+    .addBearerAuth()
+    .build();
+
+  const documentEn = SwaggerModule.createDocument(input.app, configEn);
+  SwaggerModule.setup('api/docs/en', input.app, documentEn);
 }

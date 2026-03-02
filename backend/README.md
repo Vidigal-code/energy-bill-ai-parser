@@ -126,10 +126,10 @@ RUN_DB_INTEGRATION=true npm run test:integration
 
 ## Swagger (OpenAPI)
 
-- URL padrão: `http://localhost:3000/api/docs`
+- URL Português: `http://localhost:3000/api/docs/pt`
+- URL English: `http://localhost:3000/api/docs/en`
 - Configuração por env:
   - `SWAGGER_ENABLED=true|false`
-  - `SWAGGER_PATH=api/docs`
 
 Endpoints úteis:
 
