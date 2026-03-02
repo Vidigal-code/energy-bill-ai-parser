@@ -27,19 +27,27 @@ const authHttp = axios.create({
 });
 
 export async function registerRequest(payload: RegisterPayload): Promise<AuthUser> {
-  const response = await authHttp.post<ApiEnvelope<AuthTokensPayload>>(
-    '/register',
-    payload,
-  );
-  return unwrapApiResponse(response.data).user;
+  try {
+    const response = await authHttp.post<ApiEnvelope<AuthTokensPayload>>(
+      '/register',
+      payload,
+    );
+    return unwrapApiResponse(response.data).user;
+  } catch (error) {
+    throw new Error(resolveAuthErrorMessage(error));
+  }
 }
 
 export async function loginRequest(payload: Credentials): Promise<AuthUser> {
-  const response = await authHttp.post<ApiEnvelope<AuthTokensPayload>>(
-    '/login',
-    payload,
-  );
-  return unwrapApiResponse(response.data).user;
+  try {
+    const response = await authHttp.post<ApiEnvelope<AuthTokensPayload>>(
+      '/login',
+      payload,
+    );
+    return unwrapApiResponse(response.data).user;
+  } catch (error) {
+    throw new Error(resolveLoginErrorMessage(error));
+  }
 }
 
 export async function meRequest(): Promise<AuthUser> {
@@ -57,4 +65,27 @@ export async function updateProfileRequest(payload: {
 }): Promise<AuthUser> {
   const response = await authHttp.patch<ApiEnvelope<AuthUser>>('/me', payload);
   return unwrapApiResponse(response.data);
+}
+
+function resolveAuthErrorMessage(error: unknown) {
+  if (axios.isAxiosError(error)) {
+    const message = (
+      error.response?.data as { error?: { message?: string } } | undefined
+    )?.error?.message;
+
+    if (typeof message === 'string' && message.trim().length > 0) {
+      return message;
+    }
+  }
+
+  return 'Credenciais invalidas.';
+}
+
+function resolveLoginErrorMessage(error: unknown) {
+  if (axios.isAxiosError(error)) {
+    if (error.response?.status === 404) {
+      return 'Usuario nao encontrado.';
+    }
+  }
+  return 'Credenciais invalidas.';
 }

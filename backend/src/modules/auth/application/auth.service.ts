@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -135,7 +136,10 @@ export class AuthService implements OnModuleInit {
     const user = await this.prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
     });
-    if (!user || !user.isActive) {
+    if (!user) {
+      throw new NotFoundException(PtBrMessages.auth.userNotFound);
+    }
+    if (!user.isActive) {
       throw new UnauthorizedException(PtBrMessages.auth.invalidCredentials);
     }
 

@@ -69,23 +69,29 @@ export class InvoicesQueryService {
       });
     }
 
-    return this.prisma.invoice.findMany({
-      where: {
-        numeroCliente: query.numeroCliente,
-        mesReferencia: query.mesReferencia,
-        uploaderUserId: query.role === 'ADMIN' ? undefined : query.userId,
-      },
-      include: {
-        metrics: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    }).then((invoices) =>
-      invoices
-        .filter((invoice) =>
-          this.isInvoiceInsidePeriodo(invoice.mesReferencia, periodoInicio, periodoFim),
-        )
-        .slice((page - 1) * pageSize, page * pageSize),
-    );
+    return this.prisma.invoice
+      .findMany({
+        where: {
+          numeroCliente: query.numeroCliente,
+          mesReferencia: query.mesReferencia,
+          uploaderUserId: query.role === 'ADMIN' ? undefined : query.userId,
+        },
+        include: {
+          metrics: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+      .then((invoices) =>
+        invoices
+          .filter((invoice) =>
+            this.isInvoiceInsidePeriodo(
+              invoice.mesReferencia,
+              periodoInicio,
+              periodoFim,
+            ),
+          )
+          .slice((page - 1) * pageSize, page * pageSize),
+      );
   }
 
   async consolidatedDashboard(userId: string, role: AppRole) {
@@ -93,7 +99,8 @@ export class InvoicesQueryService {
       context: 'InvoicesQueryService',
       message: PtBrMessages.logs.invoicesQuery.buildingConsolidatedDashboard,
     });
-    const where = role === 'ADMIN' ? {} : { invoice: { uploaderUserId: userId } };
+    const where =
+      role === 'ADMIN' ? {} : { invoice: { uploaderUserId: userId } };
     const aggregate = await this.prisma.invoiceMetrics.aggregate({
       where,
       _sum: {
@@ -215,7 +222,11 @@ export class InvoicesQueryService {
     periodoInicio: number | null,
     periodoFim: number | null,
   ) {
-    if (periodoInicio !== null && periodoFim !== null && periodoInicio > periodoFim) {
+    if (
+      periodoInicio !== null &&
+      periodoFim !== null &&
+      periodoInicio > periodoFim
+    ) {
       throw new BadRequestException(PtBrMessages.invoices.invalidPeriodoRange);
     }
   }

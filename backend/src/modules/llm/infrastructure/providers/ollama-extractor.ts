@@ -25,7 +25,7 @@ type OllamaExtractorConfig = {
 };
 
 export class OllamaExtractor implements ILlmExtractor {
-  constructor(private readonly config: OllamaExtractorConfig) { }
+  constructor(private readonly config: OllamaExtractorConfig) {}
 
   async extractInvoiceData(
     input: ExtractInvoiceInput,

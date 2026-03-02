@@ -21,7 +21,11 @@ function parseMonthToken(rawMonth: string): number | null {
   }
 
   const numericMonth = Number.parseInt(cleaned, 10);
-  if (Number.isInteger(numericMonth) && numericMonth >= 1 && numericMonth <= 12) {
+  if (
+    Number.isInteger(numericMonth) &&
+    numericMonth >= 1 &&
+    numericMonth <= 12
+  ) {
     return numericMonth;
   }
 

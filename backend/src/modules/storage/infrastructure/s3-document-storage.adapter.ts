@@ -8,9 +8,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import {
-  ApiLogger,
-} from '../../../shared/logging/api-logger';
+import { ApiLogger } from '../../../shared/logging/api-logger';
 import {
   DocumentStoragePort,
   StoredDocumentFile,

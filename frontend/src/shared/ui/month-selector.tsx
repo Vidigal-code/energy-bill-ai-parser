@@ -31,6 +31,14 @@ function parseYearMonth(value: string): { year: string; month: string } {
   return { year: match[1], month: match[2] };
 }
 
+function currentYearMonth() {
+  const now = new Date();
+  return {
+    year: String(now.getFullYear()),
+    month: String(now.getMonth() + 1).padStart(2, '0'),
+  };
+}
+
 export function MonthSelector({
   label,
   value,
@@ -49,19 +57,21 @@ export function MonthSelector({
   }, [startYear, endYear]);
 
   function handleYearChange(nextYear: string) {
-    if (!nextYear || !month) {
+    if (!nextYear) {
       onChange('');
       return;
     }
-    onChange(`${nextYear}-${month}`);
+    const fallback = currentYearMonth();
+    onChange(`${nextYear}-${month || fallback.month}`);
   }
 
   function handleMonthChange(nextMonth: string) {
-    if (!year || !nextMonth) {
+    if (!nextMonth) {
       onChange('');
       return;
     }
-    onChange(`${year}-${nextMonth}`);
+    const fallback = currentYearMonth();
+    onChange(`${year || fallback.year}-${nextMonth}`);
   }
 
   return (

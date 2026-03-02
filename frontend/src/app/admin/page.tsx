@@ -37,6 +37,12 @@ type EditableInvoice = {
   mesReferencia: string;
 };
 
+type DeleteTarget = {
+  id: string;
+  kind: 'usuario' | 'fatura' | 'arquivo';
+  label: string;
+};
+
 export default function AdminPage() {
   const queryClient = useQueryClient();
   const [feedback, setFeedback] = useState('');
@@ -46,6 +52,7 @@ export default function AdminPage() {
   const [editUserRole, setEditUserRole] = useState<RoleType>('USER');
   const [editUserActive, setEditUserActive] = useState(true);
   const [editInvoiceMes, setEditInvoiceMes] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const usersQuery = useQuery({
     queryKey: ['admin', 'users'],
     queryFn: listAdminUsers,
@@ -210,6 +217,32 @@ export default function AdminPage() {
     );
   }
 
+  function openDeleteModal(target: DeleteTarget) {
+    setDeleteTarget(target);
+  }
+
+  function handleConfirmDelete() {
+    if (!deleteTarget) {
+      return;
+    }
+
+    if (deleteTarget.kind === 'usuario') {
+      deleteUserMutation.mutate(deleteTarget.id, {
+        onSuccess: () => setDeleteTarget(null),
+      });
+      return;
+    }
+    if (deleteTarget.kind === 'fatura') {
+      deleteInvoiceMutation.mutate(deleteTarget.id, {
+        onSuccess: () => setDeleteTarget(null),
+      });
+      return;
+    }
+    deleteDocumentMutation.mutate(deleteTarget.id, {
+      onSuccess: () => setDeleteTarget(null),
+    });
+  }
+
   return (
     <RequireAuth role="ADMIN">
       <AppShell>
@@ -271,7 +304,11 @@ export default function AdminPage() {
                           <Button
                             variant="danger"
                             onClick={() =>
-                              deleteUserMutation.mutate(String(user.id))
+                              openDeleteModal({
+                                id: String(user.id),
+                                kind: 'usuario',
+                                label: String(user.username ?? user.email ?? user.id),
+                              })
                             }
                           >
                             Excluir
@@ -299,7 +336,13 @@ export default function AdminPage() {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => deleteUserMutation.mutate(String(user.id))}
+                      onClick={() =>
+                        openDeleteModal({
+                          id: String(user.id),
+                          kind: 'usuario',
+                          label: String(user.username ?? user.email ?? user.id),
+                        })
+                      }
                     >
                       Excluir
                     </Button>
@@ -333,7 +376,11 @@ export default function AdminPage() {
                           <Button
                             variant="danger"
                             onClick={() =>
-                              deleteInvoiceMutation.mutate(String(invoice.id))
+                              openDeleteModal({
+                                id: String(invoice.id),
+                                kind: 'fatura',
+                                label: String(invoice.fileName ?? invoice.id),
+                              })
                             }
                           >
                             Excluir
@@ -360,7 +407,13 @@ export default function AdminPage() {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => deleteInvoiceMutation.mutate(String(invoice.id))}
+                      onClick={() =>
+                        openDeleteModal({
+                          id: String(invoice.id),
+                          kind: 'fatura',
+                          label: String(invoice.fileName ?? invoice.id),
+                        })
+                      }
                     >
                       Excluir
                     </Button>
@@ -398,7 +451,11 @@ export default function AdminPage() {
                           <Button
                             variant="danger"
                             onClick={() =>
-                              deleteDocumentMutation.mutate(String(document.id))
+                              openDeleteModal({
+                                id: String(document.id),
+                                kind: 'arquivo',
+                                label: String(document.fileName ?? document.id),
+                              })
                             }
                           >
                             Excluir
@@ -424,7 +481,13 @@ export default function AdminPage() {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => deleteDocumentMutation.mutate(String(document.id))}
+                      onClick={() =>
+                        openDeleteModal({
+                          id: String(document.id),
+                          kind: 'arquivo',
+                          label: String(document.fileName ?? document.id),
+                        })
+                      }
                     >
                       Excluir
                     </Button>
@@ -559,9 +622,51 @@ export default function AdminPage() {
             />
           </form>
         </Modal>
+
+        <Modal
+          open={deleteTarget !== null}
+          title="Confirmar exclusão"
+          onClose={() => setDeleteTarget(null)}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleConfirmDelete}
+                disabled={
+                  deleteUserMutation.isPending ||
+                  deleteInvoiceMutation.isPending ||
+                  deleteDocumentMutation.isPending ||
+                  !deleteTarget
+                }
+              >
+                Excluir
+              </Button>
+            </>
+          }
+        >
+          <p className="text-sm text-[var(--text-primary)]">
+            {buildDeleteConfirmationMessage(deleteTarget)}
+          </p>
+        </Modal>
       </AppShell>
     </RequireAuth>
   );
+}
+
+function buildDeleteConfirmationMessage(target: DeleteTarget | null) {
+  if (!target) {
+    return '';
+  }
+  if (target.kind === 'usuario') {
+    return `Tem certeza que deseja excluir este usuario: ${target.label}?`;
+  }
+  if (target.kind === 'fatura') {
+    return `Tem certeza que deseja excluir esta fatura: ${target.label}?`;
+  }
+  return `Tem certeza que deseja excluir este arquivo: ${target.label}?`;
 }
 
 function readAuditValue(log: Record<string, unknown>, key: string) {

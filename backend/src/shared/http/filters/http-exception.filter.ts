@@ -27,9 +27,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const multerCode =
       exception &&
-        typeof exception === 'object' &&
-        'code' in exception &&
-        typeof (exception as { code?: unknown }).code === 'string'
+      typeof exception === 'object' &&
+      'code' in exception &&
+      typeof (exception as { code?: unknown }).code === 'string'
         ? (exception as { code: string }).code
         : undefined;
 
@@ -80,7 +80,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       method: request.method,
       statusCode: status,
       message,
-      error: status === HttpStatus.INTERNAL_SERVER_ERROR ? exception : undefined,
+      error:
+        status === HttpStatus.INTERNAL_SERVER_ERROR ? exception : undefined,
     });
 
     response.status(status).json(

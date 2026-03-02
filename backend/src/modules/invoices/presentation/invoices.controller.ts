@@ -139,7 +139,9 @@ export class InvoicesController {
   }
 
   @Get('dashboard/consolidated')
-  @ApiOperation({ summary: 'Consultar dashboard consolidado (energia + financeiro)' })
+  @ApiOperation({
+    summary: 'Consultar dashboard consolidado (energia + financeiro)',
+  })
   @ApiOkResponse({ description: 'Dashboard consolidado retornado com sucesso' })
   consolidatedDashboard(@CurrentUser() user: AuthUser) {
     return this.invoicesQueryService.consolidatedDashboard(user.sub, user.role);

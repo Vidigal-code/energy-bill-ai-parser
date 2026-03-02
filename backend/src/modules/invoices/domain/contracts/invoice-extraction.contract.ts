@@ -46,24 +46,24 @@ export type InvoiceExtractionReference = z.infer<
 >;
 
 export const DEFAULT_INVOICE_EXTRACTION_REFERENCE: InvoiceExtractionReference =
-{
-  requiredFields: [
-    '"Nº DO CLIENTE" (Ex: 7202210726)',
-    '"Mês de referência" (Ex: SET/2024)',
-    "'Energia Elétrica' - Quantidade (kWh) e Valor (R$)",
-    "'Energia SCEEE s/ICMS' - Quantidade (kWh) e Valor (R$)",
-    "'Energia compensada GD I' - Quantidade (kWh) e Valor (R$)",
-    "'Contrib Ilum Publica Municipal' - Valor (R$)"
-  ],
-  businessRules: {
-    consumoEnergiaEletricaKwh:
-      "'Energia Elétrica' Quantidade (kWh) + 'Energia SCEEE s/ICMS' Quantidade (kWh)",
-    energiaCompensadaKwh: "'Energia compensada GD I' Quantidade (kWh)",
-    valorTotalSemGdRs:
-      "'Energia Elétrica' Valor (R$) + 'Energia SCEEE s/ICMS' Valor (R$) + 'Contrib Ilum Publica Municipal' Valor (R$)",
-    economiaGdRs: "'Energia compensada GD I' Valor (R$)",
-  },
-};
+  {
+    requiredFields: [
+      '"Nº DO CLIENTE" (Ex: 7202210726)',
+      '"Mês de referência" (Ex: SET/2024)',
+      "'Energia Elétrica' - Quantidade (kWh) e Valor (R$)",
+      "'Energia SCEEE s/ICMS' - Quantidade (kWh) e Valor (R$)",
+      "'Energia compensada GD I' - Quantidade (kWh) e Valor (R$)",
+      "'Contrib Ilum Publica Municipal' - Valor (R$)",
+    ],
+    businessRules: {
+      consumoEnergiaEletricaKwh:
+        "'Energia Elétrica' Quantidade (kWh) + 'Energia SCEEE s/ICMS' Quantidade (kWh)",
+      energiaCompensadaKwh: "'Energia compensada GD I' Quantidade (kWh)",
+      valorTotalSemGdRs:
+        "'Energia Elétrica' Valor (R$) + 'Energia SCEEE s/ICMS' Valor (R$) + 'Contrib Ilum Publica Municipal' Valor (R$)",
+      economiaGdRs: "'Energia compensada GD I' Valor (R$)",
+    },
+  };
 
 export const DEFAULT_INVOICE_EXTRACTION_PROMPT = `
 Você é um extrator de dados de fatura de energia elétrica. Seu objetivo é realizar a análise multimodal do documento PDF fornecido e extrair os dados estruturados.

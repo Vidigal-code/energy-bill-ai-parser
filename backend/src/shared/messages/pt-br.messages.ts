@@ -47,8 +47,10 @@ export class PtBrMessages {
       'Falha ao remover arquivo durante rollback de erro.',
     pdfExceededMaximumAllowed:
       'Nao vamos processar porque o arquivo PDF excedeu o limite maximo permitido.',
-    invalidPeriodoInicio: 'Periodo inicio invalido. Use MMM/YYYY, MM/YYYY ou YYYY-MM.',
-    invalidPeriodoFim: 'Periodo fim invalido. Use MMM/YYYY, MM/YYYY ou YYYY-MM.',
+    invalidPeriodoInicio:
+      'Periodo inicio invalido. Use MMM/YYYY, MM/YYYY ou YYYY-MM.',
+    invalidPeriodoFim:
+      'Periodo fim invalido. Use MMM/YYYY, MM/YYYY ou YYYY-MM.',
     invalidPeriodoRange:
       'Periodo invalido: periodo inicio nao pode ser maior que periodo fim.',
   };

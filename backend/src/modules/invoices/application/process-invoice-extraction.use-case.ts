@@ -54,7 +54,7 @@ export class ProcessInvoiceExtractionUseCase {
     private readonly documentStorage: DocumentStoragePort,
     private readonly fileCryptoService: FileCryptoService,
     private readonly auditService: AuditService,
-  ) { }
+  ) {}
 
   /**
    *

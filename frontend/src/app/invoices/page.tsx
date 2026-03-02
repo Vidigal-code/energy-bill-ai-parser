@@ -301,12 +301,40 @@ function toMonthKey(value: string) {
   if (!value) {
     return null;
   }
-  const [year, month] = value.split('-');
-  if (!year || !month) {
+  const isoMatch = value.trim().match(/^(\d{4})-(\d{2})$/);
+  if (isoMatch) {
+    const parsedYear = Number.parseInt(isoMatch[1], 10);
+    const parsedMonth = Number.parseInt(isoMatch[2], 10);
+    if (!Number.isFinite(parsedYear) || !Number.isFinite(parsedMonth)) {
+      return null;
+    }
+    return parsedYear * 100 + parsedMonth;
+  }
+
+  const slashMatch = value.trim().match(/^([A-Za-z]{3}|\d{1,2})\/(\d{4})$/);
+  if (!slashMatch) {
     return null;
   }
-  const parsedYear = Number.parseInt(year, 10);
-  const parsedMonth = Number.parseInt(month, 10);
+  const monthToken = slashMatch[1].toLowerCase();
+  const parsedYear = Number.parseInt(slashMatch[2], 10);
+  const months: Record<string, number> = {
+    jan: 1,
+    fev: 2,
+    mar: 3,
+    abr: 4,
+    mai: 5,
+    jun: 6,
+    jul: 7,
+    ago: 8,
+    set: 9,
+    out: 10,
+    nov: 11,
+    dez: 12,
+  };
+  const parsedMonth =
+    monthToken in months
+      ? months[monthToken]
+      : Number.parseInt(monthToken, 10);
   if (!Number.isFinite(parsedYear) || !Number.isFinite(parsedMonth)) {
     return null;
   }
