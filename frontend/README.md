@@ -60,3 +60,5 @@ Acesso padrão:
 
 - Frontend: `http://localhost:3001`
 - Backend API: `http://localhost:3000`
+- Swagger (English): `http://localhost:3000/api/docs/en`
+- Swagger (Português): `http://localhost:3000/api/docs/pt`
