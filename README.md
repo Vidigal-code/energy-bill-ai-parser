@@ -68,21 +68,40 @@ Configuração principal via variáveis de ambiente:
 - Mensagens e logs centralizados em `backend/src/shared/messages/pt-br.messages.ts`.
 - Logger sem `console`, com níveis (`LOG`, `INFO`, `WARNING`, `SUCCESS`, `ERROR`).
 
-## Ambiente
+## 🛠 Ambiente
 
-Para rodar, utilize as variáveis abaixo. Note que para rodar 100% com análise visão de PDF, insira sua chave do Gemini.
+Para rodar o projeto, configure as variáveis de ambiente abaixo.
 
-- `GEMINI_API_KEY=sua_chave_aqui`
-- `/.env`
-- `/.env.example`
+Se quiser utilizar **análise de visão de PDF (100%)**, insira sua chave da API do Gemini:
 
-## Execução com Docker
+```
+GEMINI_API_KEY=sua_chave_aqui
+```
 
-Na raiz do projeto:
+### 📄 Arquivos importantes
+
+* `.env` → Arquivo final com suas variáveis configuradas
+* `envexample.txt` → Arquivo de exemplo para basear sua configuração
+
+> 💡 Dica: renomeie `envexample.txt` para `.env` e preencha com suas informações.
+
+---
+
+## 🐳 Execução com Docker
+
+Na raiz do projeto, certifique-se de que o arquivo esteja nomeado como `.env`.
+
+Depois, execute:
 
 ```bash
 docker compose up --build
 ```
+
+Isso irá:
+
+* Construir a imagem
+* Criar os containers
+* Iniciar a aplicação
 
 Executar suíte de testes em container (profile dedicado):
 
