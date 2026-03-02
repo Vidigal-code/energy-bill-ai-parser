@@ -8,6 +8,7 @@ import {
 import { Request, Response } from 'express';
 import { ApiResponsePresenter } from '../presenters/api-response.presenter';
 import { ApiLogger } from '../../logging/api-logger';
+import { PtBrMessages } from '../../messages/pt-br.messages';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -21,8 +22,38 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    let message: string | string[] = 'Internal server error';
+    let message: string | string[] = PtBrMessages.common.internalServerError;
     let details: unknown;
+
+    const multerCode =
+      exception &&
+      typeof exception === 'object' &&
+      'code' in exception &&
+      typeof (exception as { code?: unknown }).code === 'string'
+        ? (exception as { code: string }).code
+        : undefined;
+
+    if (multerCode === 'LIMIT_FILE_SIZE') {
+      message = PtBrMessages.invoices.pdfExceededMaximumAllowed;
+      details = {
+        code: multerCode,
+      };
+      ApiLogger.logError({
+        path: request.url,
+        method: request.method,
+        statusCode: HttpStatus.PAYLOAD_TOO_LARGE,
+        message,
+      });
+      response.status(HttpStatus.PAYLOAD_TOO_LARGE).json(
+        ApiResponsePresenter.error({
+          path: request.url,
+          statusCode: HttpStatus.PAYLOAD_TOO_LARGE,
+          message,
+          details,
+        }),
+      );
+      return;
+    }
 
     if (exception instanceof HttpException) {
       const responsePayload = exception.getResponse();

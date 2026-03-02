@@ -1,12 +1,18 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { JwtAuthGuard } from './modules/auth/presentation/guards/jwt-auth.guard';
+import { RolesGuard } from './modules/auth/presentation/guards/roles.guard';
 import { HttpExceptionFilter } from './shared/http/filters/http-exception.filter';
 import { SuccessResponseInterceptor } from './shared/http/interceptors/success-response.interceptor';
 import { ApiLogger } from './shared/logging/api-logger';
+import { PtBrMessages } from './shared/messages/pt-br.messages';
 
 async function bootstrap() {
-  ApiLogger.log({ context: 'Bootstrap', message: 'Starting API bootstrap.' });
+  ApiLogger.log({
+    context: 'Bootstrap',
+    message: PtBrMessages.system.bootstrapStarting,
+  });
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
@@ -17,6 +23,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.useGlobalGuards(app.get(JwtAuthGuard), app.get(RolesGuard));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new SuccessResponseInterceptor());
 
@@ -24,12 +31,12 @@ async function bootstrap() {
   await app.listen(port);
   ApiLogger.info({
     context: 'Bootstrap',
-    message: `API started on port ${port}.`,
+    message: PtBrMessages.system.bootstrapStarted(port),
   });
 }
 void bootstrap().catch((error: unknown) => {
   const message =
-    error instanceof Error ? error.message : 'Unknown bootstrap error';
+    error instanceof Error ? error.message : PtBrMessages.common.unknownError;
   ApiLogger.logError({
     path: 'bootstrap',
     method: 'SYSTEM',

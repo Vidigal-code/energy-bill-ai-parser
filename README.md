@@ -1,74 +1,67 @@
-# Energy Bill AI Parser (Backend Focus)
+# Energy Bill AI Parser
 
-API backend para processar faturas de energia em PDF, extrair dados estruturados com LLM e expor endpoints REST para consulta e dashboard.
+Backend enterprise-oriented para processamento de faturas de energia com IA, autenticação segura, RBAC, auditoria e armazenamento criptografado.
 
 <details>
 <summary><strong>🇧🇷 Descrição em Português</strong></summary>
 
-Este projeto implementa o desafio técnico com foco inicial no **backend** usando:
+## Objetivo atual
 
-- Node.js
-- NestJS
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- Ollama (LLM open-source)
-- Docker (orquestração)
+O foco atual do repositório é o backend em NestJS para:
 
-### Regras de negócio do desafio (escopo atual)
+- upload de PDF;
+- extração estruturada com múltiplos provedores de IA;
+- cálculo de métricas de negócio;
+- persistência com Prisma/PostgreSQL;
+- controle de acesso com JWT + RBAC (`ADMIN` e `USER`);
+- trilha de auditoria e gestão administrativa completa.
 
-A extração da fatura deve retornar, no mínimo:
+## Stack
 
-- `numeroCliente`
-- `mesReferencia`
-- `itensFatura.energiaEletrica.quantidadeKwh`
-- `itensFatura.energiaEletrica.valorRs`
-- `itensFatura.energiaSceeSemIcms.quantidadeKwh`
-- `itensFatura.energiaSceeSemIcms.valorRs`
-- `itensFatura.energiaCompensadaGdi.quantidadeKwh`
-- `itensFatura.energiaCompensadaGdi.valorRs`
-- `itensFatura.contribIlumPublicaMunicipal.valorRs`
+- Node.js, NestJS, TypeScript
+- Prisma ORM, PostgreSQL
+- LLMs: Ollama, OpenAI, Gemini/Google, Claude/Anthropic
+- AWS S3 (LocalStack no ambiente local)
+- Docker Compose
 
-Variáveis calculadas (regra do desafio):
+## Arquitetura atual (resumo)
 
-- `consumoEnergiaEletricaKwh = energiaEletrica.kwh + energiaSceeSemIcms.kwh`
-- `energiaCompensadaKwh = energiaCompensadaGdi.kwh`
-- `valorTotalSemGdRs = energiaEletrica.rs + energiaSceeSemIcms.rs + contribIlumPublicaMunicipal.rs`
-- `economiaGdRs = energiaCompensadaGdi.rs`
+- `backend/src/modules/auth`: registro, login, refresh token, logout, perfil e guards.
+- `backend/src/modules/admin`: CRUD administrativo de usuários, documentos, faturas e auditoria.
+- `backend/src/modules/invoices`: upload, extração, dashboards e listagem por papel.
+- `backend/src/modules/llm`: seleção dinâmica de provider e adapters por provedor.
+- `backend/src/modules/storage`: criptografia JWE e armazenamento S3.
+- `backend/src/modules/audit`: persistência de logs de auditoria.
+- `backend/src/shared`: config/env, logger, resposta HTTP padrão, filtros e mensagens centralizadas.
 
-### Extração configurável (reutilizável para qualquer fatura)
+## Extração configurável
 
-A referência de extração está centralizada em TypeScript:
+Contrato central de extração:
 
 - `backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts`
 
-Nesse arquivo ficam:
+Configuração principal via variáveis de ambiente:
 
-- schema de validação da extração;
-- tipagem canônica dos dados;
-- referência dos campos obrigatórios;
-- prompt-base de extração;
-- cálculo das métricas de negócio.
+- `INVOICE_EXTRACTION_REFERENCE`
+- `INVOICE_EXTRACTION_PROMPT`
+- `INVOICE_EXTRACTION_CONTEXT`
 
-Isso permite evoluir para diferentes concessionárias e layouts de fatura, alterando o contrato de extração de forma centralizada.
+## Segurança e padrões
 
-### Estratégia de provedores de IA
+- Rotas protegidas por autenticação global (exceto rotas públicas de auth/health).
+- RBAC com `ADMIN` e `USER`.
+- Respostas centralizadas em formato padrão (`success/error`).
+- Mensagens e logs centralizados em `backend/src/shared/messages/pt-br.messages.ts`.
+- Logger sem `console`, com níveis (`LOG`, `INFO`, `WARNING`, `SUCCESS`, `ERROR`).
 
-A seleção de IA é controlada por variáveis de ambiente:
+## Ambiente
 
-- `OPEN_SOURCE_IA=true` -> prioriza `ollama`;
-- `OPEN_SOURCE_IA=false` + `LLM_PROVIDER=openai|gemini|claude`.
+Use somente arquivos de ambiente na raiz:
 
-### Configuração de ambiente (sempre na raiz)
+- `/.env`
+- `/.env.example`
 
-Este repositório usa **somente**:
-
-- `/.env` (local)
-- `/.env.example` (template)
-
-Não usar `backend/.env`.
-
-### Como rodar com Docker
+## Execução com Docker
 
 Na raiz do projeto:
 
@@ -76,70 +69,89 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
-Serviços:
+Serviços principais:
 
 - API: `http://localhost:3000`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
 - Ollama: `http://localhost:11434`
+- LocalStack (S3): `http://localhost:4566`
 
 </details>
 
 <details>
 <summary><strong>🇬🇧 English Description</strong></summary>
 
-Backend API to process utility bill PDFs, extract structured data using LLMs, and expose REST endpoints for listing and dashboard metrics.
+## Current Goal
 
-### Current stack
+The current repository focus is the NestJS backend to provide:
 
-- Node.js
-- NestJS
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- Ollama (open-source LLM)
-- Docker
+- PDF upload;
+- structured extraction with multiple AI providers;
+- business metrics computation;
+- Prisma/PostgreSQL persistence;
+- secure auth and RBAC (`ADMIN` and `USER`);
+- audit trail and full admin management.
 
-### Business rules currently covered
+## Stack
 
-The extraction contract requires:
+- Node.js, NestJS, TypeScript
+- Prisma ORM, PostgreSQL
+- LLMs: Ollama, OpenAI, Gemini/Google, Claude/Anthropic
+- AWS S3 (LocalStack for local development)
+- Docker Compose
 
-- customer number
-- reference month
-- electric energy (kWh + BRL)
-- SCEE without ICMS (kWh + BRL)
-- compensated GD energy (kWh + BRL)
-- municipal public lighting fee (BRL)
+## Current Architecture (overview)
 
-Computed metrics:
+- `backend/src/modules/auth`: register, login, refresh, logout, profile, guards.
+- `backend/src/modules/admin`: admin CRUD for users, documents, invoices, audit data.
+- `backend/src/modules/invoices`: upload, extraction, dashboards, role-aware listing.
+- `backend/src/modules/llm`: dynamic provider selection and provider adapters.
+- `backend/src/modules/storage`: JWE file encryption and S3 persistence.
+- `backend/src/modules/audit`: audit log persistence.
+- `backend/src/shared`: env/config, logger, HTTP response contract, filters, centralized messages.
 
-- total electric consumption (kWh)
-- compensated energy (kWh)
-- total amount without GD (BRL)
-- GD savings (BRL)
+## Configurable Extraction
 
-### Configurable extraction contract
-
-The extraction is centralized in:
+Central extraction contract:
 
 - `backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts`
 
-This file is the reusable source of truth for:
+Main environment-driven extraction settings:
 
-- required extracted fields
-- extraction schema and types
-- base prompt for LLM providers
-- business metrics computation
+- `INVOICE_EXTRACTION_REFERENCE`
+- `INVOICE_EXTRACTION_PROMPT`
+- `INVOICE_EXTRACTION_CONTEXT`
 
-It allows adapting extraction logic for different invoice layouts while keeping a stable backend contract.
+## Security and Standards
 
-### Environment convention
+- Global authentication on app routes (except public auth/health endpoints).
+- RBAC with `ADMIN` and `USER`.
+- Centralized API response format (`success/error`).
+- Centralized messages and logs in `backend/src/shared/messages/pt-br.messages.ts`.
+- Logger levels (`LOG`, `INFO`, `WARNING`, `SUCCESS`, `ERROR`) without `console`.
 
-Use root-level files only:
+## Environment Convention
+
+Use root environment files only:
 
 - `/.env`
 - `/.env.example`
 
-No `backend/.env`.
+## Run with Docker
+
+From repository root:
+
+```bash
+docker compose up --build
+```
+
+Main services:
+
+- API: `http://localhost:3000`
+- Health: `http://localhost:3000/api/health`
+- PostgreSQL: `localhost:5432`
+- Ollama: `http://localhost:11434`
+- LocalStack (S3): `http://localhost:4566`
 
 </details>

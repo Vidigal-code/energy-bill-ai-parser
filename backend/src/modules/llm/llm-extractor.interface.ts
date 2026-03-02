@@ -1,6 +1,6 @@
 import { InvoiceExtraction } from '../invoices/domain/contracts/invoice-extraction.contract';
 
-export type LlmProvider = 'ollama' | 'openai' | 'gemini' | 'claude';
+export type LlmProvider = 'ollama' | 'openai' | 'gemini' | 'google' | 'claude';
 
 export type ExtractInvoiceInput = {
   pdfBuffer: Buffer;

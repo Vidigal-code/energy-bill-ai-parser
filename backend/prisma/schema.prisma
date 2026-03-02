@@ -12,30 +12,59 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
+enum InvoiceStatus {
+  PROCESSING
+  SUCCESS
+  ERROR
+}
+
+enum AuditStatus {
+  SUCCESS
+  ERROR
+}
+
 model User {
-  id           String         @id @default(cuid())
-  email        String         @unique
-  passwordHash String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  refreshTokens RefreshToken[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  username       String          @unique
+  passwordHash   String
+  role           Role            @default(USER)
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  refreshTokens  RefreshToken[]
+  invoices       Invoice[]
+  auditLogs      AuditLog[]
+  storedDocuments StoredDocument[] @relation("UploaderDocuments")
 }
 
 model RefreshToken {
-  id        String   @id @default(cuid())
-  userId    String
-  tokenHash String
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String   @id @default(cuid())
+  userId           String
+  tokenHash        String
+  jti              String   @unique
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  replacedByTokenId String?
+  userAgent        String?
+  ip               String?
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model Invoice {
   id                                 String         @id @default(cuid())
+  uploaderUserId                     String
   fileName                           String
+  status                             InvoiceStatus  @default(PROCESSING)
+  errorMessage                       String?
   numeroCliente                      String
   mesReferencia                      String
   energiaEletricaQuantidadeKwh       Decimal        @db.Decimal(14, 3)
@@ -50,9 +79,13 @@ model Invoice {
   createdAt                          DateTime       @default(now())
   updatedAt                          DateTime       @updatedAt
   metrics                            InvoiceMetrics?
+  uploader                           User           @relation(fields: [uploaderUserId], references: [id], onDelete: Restrict)
+  documents                          StoredDocument[]
 
+  @@index([uploaderUserId])
   @@index([numeroCliente])
   @@index([mesReferencia])
+  @@index([status])
 }
 
 model InvoiceMetrics {
@@ -65,4 +98,44 @@ model InvoiceMetrics {
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
   invoice                    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model StoredDocument {
+  id             String   @id @default(cuid())
+  invoiceId      String?
+  uploaderUserId String
+  bucket         String
+  objectKey      String   @unique
+  fileName       String
+  mimeType       String
+  sizeBytes      Int
+  checksum       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  invoice        Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  uploader       User     @relation("UploaderDocuments", fields: [uploaderUserId], references: [id], onDelete: Restrict)
+
+  @@index([uploaderUserId])
+  @@index([invoiceId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  actorUserId String?
+  action      String
+  resourceType String
+  resourceId  String?
+  status      AuditStatus @default(SUCCESS)
+  message     String
+  meta        Json?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+  actor       User?       @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
 }

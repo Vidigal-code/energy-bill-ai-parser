@@ -86,9 +86,8 @@ Campos obrigatórios:
 - itensFatura.contribIlumPublicaMunicipal.valorRs
 `.trim();
 
-export const INVOICE_EXTRACTION_REFERENCE =
-  DEFAULT_INVOICE_EXTRACTION_REFERENCE;
-export const INVOICE_EXTRACTION_PROMPT = DEFAULT_INVOICE_EXTRACTION_PROMPT;
+export const DEFAULT_INVOICE_EXTRACTION_CONTEXT =
+  'Analise o arquivo "{{fileName}}" e retorne somente JSON válido com os campos definidos em INVOICE_EXTRACTION_REFERENCE.';
 
 export function resolveInvoiceExtractionReference(
   rawReference?: string,
@@ -112,6 +111,15 @@ export function resolveInvoiceExtractionPrompt(rawPrompt?: string): string {
   }
 
   return prompt;
+}
+
+export function resolveInvoiceExtractionContext(rawContext?: string): string {
+  const context = rawContext?.trim();
+  if (!context) {
+    return DEFAULT_INVOICE_EXTRACTION_CONTEXT;
+  }
+
+  return context;
 }
 
 export function computeInvoiceMetrics(

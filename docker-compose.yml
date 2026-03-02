@@ -31,6 +31,21 @@ services:
       timeout: 10s
       retries: 5
 
+  localstack:
+    image: localstack/localstack:latest
+    container_name: ebill_localstack
+    restart: unless-stopped
+    environment:
+      SERVICES: s3
+      DEBUG: '0'
+      AWS_DEFAULT_REGION: us-east-1
+    ports:
+      - '4566:4566'
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/localstack/init-s3.sh:/etc/localstack/init/ready.d/init-s3.sh
+
   backend:
     build:
       context: ./backend
@@ -44,6 +59,13 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
       OPEN_SOURCE_IA: 'true'
       LLM_PROVIDER: ollama
+      STORAGE_DRIVER: localstack
+      S3_ENDPOINT: http://localstack:4566
+      S3_BUCKET: energy-bills
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: test
+      S3_SECRET_ACCESS_KEY: test
+      S3_FORCE_PATH_STYLE: 'true'
     ports:
       - '3000:3000'
     depends_on:
@@ -51,7 +73,10 @@ services:
         condition: service_healthy
       ollama:
         condition: service_started
+      localstack:
+        condition: service_started
 
 volumes:
   postgres_data:
   ollama_data:
+  localstack_data:
