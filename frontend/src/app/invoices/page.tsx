@@ -7,8 +7,10 @@ import { RequireAuth } from '@/features/session/require-auth';
 import { Card } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
+import { Modal } from '@/shared/ui/modal';
 import { MonthSelector } from '@/shared/ui/month-selector';
 import {
+  type InvoiceRecord,
   listInvoices,
   listMyDocuments,
   uploadInvoice,
@@ -28,6 +30,7 @@ export default function InvoicesPage() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
   const [page, setPage] = useState(1);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRecord | null>(null);
 
   const invoicesQuery = useQuery({
     queryKey: [
@@ -188,6 +191,7 @@ export default function InvoicesPage() {
                     <th className="px-3 py-2">Arquivo</th>
                     <th className="px-3 py-2">Numero cliente</th>
                     <th className="px-3 py-2">Mes referencia</th>
+                    <th className="px-3 py-2">Acoes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,6 +200,11 @@ export default function InvoicesPage() {
                       <td className="px-3 py-2">{invoice.fileName}</td>
                       <td className="px-3 py-2">{invoice.numeroCliente}</td>
                       <td className="px-3 py-2">{invoice.mesReferencia}</td>
+                      <td className="px-3 py-2">
+                        <Button type="button" variant="ghost" onClick={() => setSelectedInvoice(invoice)}>
+                          Ver informacoes
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -210,6 +219,11 @@ export default function InvoicesPage() {
                   <p className="break-all"><strong>Arquivo:</strong> {invoice.fileName}</p>
                   <p className="break-all"><strong>Numero cliente:</strong> {invoice.numeroCliente}</p>
                   <p><strong>Mes referencia:</strong> {invoice.mesReferencia}</p>
+                  <div className="mt-3">
+                    <Button type="button" variant="ghost" onClick={() => setSelectedInvoice(invoice)}>
+                      Ver informacoes
+                    </Button>
+                  </div>
                 </article>
               ))}
             </div>
@@ -292,8 +306,58 @@ export default function InvoicesPage() {
             ) : null}
           </Card>
         </div>
+
+        <Modal
+          open={selectedInvoice !== null}
+          title="Informacoes da fatura"
+          onClose={() => setSelectedInvoice(null)}
+          footer={
+            <Button type="button" variant="ghost" onClick={() => setSelectedInvoice(null)}>
+              Fechar
+            </Button>
+          }
+        >
+          {selectedInvoice ? (
+            <div className="grid gap-3 text-sm text-[var(--text-primary)]">
+              <InvoiceInfoRow label="Arquivo" value={selectedInvoice.fileName} />
+              <InvoiceInfoRow label="Numero do cliente" value={selectedInvoice.numeroCliente} />
+              <InvoiceInfoRow label="Mes de referencia" value={selectedInvoice.mesReferencia} />
+              <InvoiceInfoRow label="Data de envio" value={formatDate(selectedInvoice.createdAt)} />
+              <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] p-3">
+                <p className="mb-2 text-sm font-semibold text-[var(--text-primary)]">Consumo e valores</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <InvoiceInfoRow
+                    label="Consumo (kWh)"
+                    value={formatNumber(selectedInvoice.metrics?.consumoEnergiaEletricaKwh ?? 0)}
+                  />
+                  <InvoiceInfoRow
+                    label="Energia compensada (kWh)"
+                    value={formatNumber(selectedInvoice.metrics?.energiaCompensadaKwh ?? 0)}
+                  />
+                  <InvoiceInfoRow
+                    label="Valor sem GD (R$)"
+                    value={formatCurrency(selectedInvoice.metrics?.valorTotalSemGdRs ?? 0)}
+                  />
+                  <InvoiceInfoRow
+                    label="Economia GD (R$)"
+                    value={formatCurrency(selectedInvoice.metrics?.economiaGdRs ?? 0)}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </Modal>
       </AppShell>
     </RequireAuth>
+  );
+}
+
+function InvoiceInfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{label}</p>
+      <p className="mt-1 break-all text-sm text-[var(--text-primary)]">{value}</p>
+    </div>
   );
 }
 
@@ -360,4 +424,17 @@ function formatDate(value: string) {
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(date);
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
 }

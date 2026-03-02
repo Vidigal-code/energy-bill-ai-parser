@@ -92,9 +92,15 @@ export async function deleteAdminDocument(documentId: string) {
   return unwrapApiResponse(response.data);
 }
 
-export async function listAdminAuditLogs() {
+export async function listAdminAuditLogs(params?: {
+  page?: number;
+  pageSize?: number;
+}) {
   const response = await apiClient.get<ApiEnvelope<Record<string, unknown>[]>>(
     '/admin/audit-logs',
+    {
+      params,
+    },
   );
   return unwrapApiResponse(response.data);
 }

@@ -43,7 +43,20 @@ type DeleteTarget = {
   label: string;
 };
 
+type InvoiceDetailsTarget = {
+  id: string;
+  fileName: string;
+  numeroCliente: string;
+  mesReferencia: string;
+  createdAt: string;
+  consumoEnergiaEletricaKwh: number;
+  energiaCompensadaKwh: number;
+  valorTotalSemGdRs: number;
+  economiaGdRs: number;
+};
+
 export default function AdminPage() {
+  const auditPageSize = 10;
   const queryClient = useQueryClient();
   const [feedback, setFeedback] = useState('');
   const [editingUser, setEditingUser] = useState<EditableUser | null>(null);
@@ -53,6 +66,8 @@ export default function AdminPage() {
   const [editUserActive, setEditUserActive] = useState(true);
   const [editInvoiceMes, setEditInvoiceMes] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
+  const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetailsTarget | null>(null);
+  const [auditPage, setAuditPage] = useState(1);
   const usersQuery = useQuery({
     queryKey: ['admin', 'users'],
     queryFn: listAdminUsers,
@@ -66,8 +81,8 @@ export default function AdminPage() {
     queryFn: listAdminDocuments,
   });
   const auditsQuery = useQuery({
-    queryKey: ['admin', 'audit-logs'],
-    queryFn: listAdminAuditLogs,
+    queryKey: ['admin', 'audit-logs', auditPage, auditPageSize],
+    queryFn: () => listAdminAuditLogs({ page: auditPage, pageSize: auditPageSize }),
   });
 
   const invalidateAll = async () => {
@@ -177,6 +192,24 @@ export default function AdminPage() {
     const mesReferencia = String(invoice.mesReferencia ?? '');
     setEditingInvoice({ id, mesReferencia });
     setEditInvoiceMes(mesReferencia);
+  }
+
+  function openInvoiceDetailsModal(invoice: Record<string, unknown>) {
+    const metrics = toRecord(invoice.metrics);
+    setInvoiceDetails({
+      id: String(invoice.id ?? ''),
+      fileName: String(invoice.fileName ?? '-'),
+      numeroCliente: String(invoice.numeroCliente ?? '-'),
+      mesReferencia: String(invoice.mesReferencia ?? '-'),
+      createdAt: String(invoice.createdAt ?? ''),
+      consumoEnergiaEletricaKwh: readNumericValue(
+        metrics,
+        'consumoEnergiaEletricaKwh',
+      ),
+      energiaCompensadaKwh: readNumericValue(metrics, 'energiaCompensadaKwh'),
+      valorTotalSemGdRs: readNumericValue(metrics, 'valorTotalSemGdRs'),
+      economiaGdRs: readNumericValue(metrics, 'economiaGdRs'),
+    });
   }
 
   function handleSaveUser() {
@@ -370,6 +403,12 @@ export default function AdminPage() {
                       <td className="px-3 py-2 text-[var(--text-primary)]">{String(invoice.mesReferencia)}</td>
                       <td className="px-3 py-2">
                         <div className="flex flex-col gap-2 sm:flex-row">
+                          <Button
+                            variant="ghost"
+                            onClick={() => openInvoiceDetailsModal(invoice)}
+                          >
+                            Ver informacoes
+                          </Button>
                           <Button variant="ghost" onClick={() => openInvoiceModal(invoice)}>
                             Editar mes
                           </Button>
@@ -402,6 +441,12 @@ export default function AdminPage() {
                   <p><strong>Arquivo:</strong> {String(invoice.fileName)}</p>
                   <p><strong>Mes:</strong> {String(invoice.mesReferencia)}</p>
                   <div className="mt-3 flex flex-col gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => openInvoiceDetailsModal(invoice)}
+                    >
+                      Ver informacoes
+                    </Button>
                     <Button variant="ghost" onClick={() => openInvoiceModal(invoice)}>
                       Editar mes
                     </Button>
@@ -546,6 +591,30 @@ export default function AdminPage() {
                 Nenhum log de auditoria encontrado.
               </p>
             ) : null}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded border border-[var(--border-color)] bg-[var(--surface-2)] p-2 text-sm text-[var(--text-primary)]">
+              <span>Pagina atual: {auditPage}</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={auditPage === 1}
+                  onClick={() => setAuditPage((current) => Math.max(1, current - 1))}
+                >
+                  Pagina anterior
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={
+                    auditsQuery.isLoading ||
+                    (auditsQuery.data ?? []).length < auditPageSize
+                  }
+                  onClick={() => setAuditPage((current) => current + 1)}
+                >
+                  Proxima pagina
+                </Button>
+              </div>
+            </div>
           </Card>
         </div>
 
@@ -624,6 +693,58 @@ export default function AdminPage() {
         </Modal>
 
         <Modal
+          open={invoiceDetails !== null}
+          title="Informacoes da fatura"
+          onClose={() => setInvoiceDetails(null)}
+          footer={
+            <Button type="button" variant="ghost" onClick={() => setInvoiceDetails(null)}>
+              Fechar
+            </Button>
+          }
+        >
+          {invoiceDetails ? (
+            <div className="grid gap-3 text-sm text-[var(--text-primary)]">
+              <InvoiceDetailItem label="Arquivo" value={invoiceDetails.fileName} />
+              <InvoiceDetailItem
+                label="Numero cliente"
+                value={invoiceDetails.numeroCliente}
+              />
+              <InvoiceDetailItem
+                label="Mes de referencia"
+                value={invoiceDetails.mesReferencia}
+              />
+              <InvoiceDetailItem
+                label="Data de upload"
+                value={formatDate(invoiceDetails.createdAt)}
+              />
+              <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] p-3">
+                <p className="mb-2 text-sm font-semibold text-[var(--text-primary)]">
+                  Consumo e valores
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <InvoiceDetailItem
+                    label="Consumo (kWh)"
+                    value={formatNumber(invoiceDetails.consumoEnergiaEletricaKwh)}
+                  />
+                  <InvoiceDetailItem
+                    label="Energia compensada (kWh)"
+                    value={formatNumber(invoiceDetails.energiaCompensadaKwh)}
+                  />
+                  <InvoiceDetailItem
+                    label="Valor sem GD (R$)"
+                    value={formatCurrency(invoiceDetails.valorTotalSemGdRs)}
+                  />
+                  <InvoiceDetailItem
+                    label="Economia GD (R$)"
+                    value={formatCurrency(invoiceDetails.economiaGdRs)}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </Modal>
+
+        <Modal
           open={deleteTarget !== null}
           title="Confirmar exclusão"
           onClose={() => setDeleteTarget(null)}
@@ -669,6 +790,17 @@ function buildDeleteConfirmationMessage(target: DeleteTarget | null) {
   return `Tem certeza que deseja excluir este arquivo: ${target.label}?`;
 }
 
+function InvoiceDetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+        {label}
+      </p>
+      <p className="mt-1 break-all text-sm text-[var(--text-primary)]">{value}</p>
+    </div>
+  );
+}
+
 function readAuditValue(log: Record<string, unknown>, key: string) {
   const value = log[key];
   if (value === null || value === undefined || value === '') {
@@ -698,4 +830,38 @@ function formatDate(value: string) {
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(date);
+}
+
+function toRecord(value: unknown): Record<string, unknown> {
+  if (typeof value !== 'object' || value === null) {
+    return {};
+  }
+  return value as Record<string, unknown>;
+}
+
+function readNumericValue(payload: Record<string, unknown>, key: string) {
+  const value = payload[key];
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Number.parseFloat(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return 0;
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
 }
