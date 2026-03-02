@@ -8,7 +8,7 @@ type ModalProps = {
   footer?: ReactNode;
 };
 
-export function Modal({ open, title, onClose, children, footer }: ModalProps) {
+export function Modal({ open, title, children, footer }: ModalProps) {
   if (!open) {
     return null;
   }
@@ -16,15 +16,8 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-3 sm:items-center sm:p-6">
       <div className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] shadow-xl">
-        <header className="flex items-center justify-between border-b border-[var(--border-color)] px-4 py-3">
+        <header className="border-b border-[var(--border-color)] px-4 py-3">
           <h3 className="text-base font-semibold text-[var(--text-primary)]">{title}</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-[var(--border-color)] px-2 py-1 text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-2)]"
-          >
-            Fechar
-          </button>
         </header>
         <div className="overflow-y-auto px-4 py-4">{children}</div>
         {footer ? (
