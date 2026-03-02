@@ -47,6 +47,10 @@ export class PtBrMessages {
       'Falha ao remover arquivo durante rollback de erro.',
     pdfExceededMaximumAllowed:
       'Nao vamos processar porque o arquivo PDF excedeu o limite maximo permitido.',
+    invalidPeriodoInicio: 'Periodo inicio invalido. Use MMM/YYYY, MM/YYYY ou YYYY-MM.',
+    invalidPeriodoFim: 'Periodo fim invalido. Use MMM/YYYY, MM/YYYY ou YYYY-MM.',
+    invalidPeriodoRange:
+      'Periodo invalido: periodo inicio nao pode ser maior que periodo fim.',
   };
 
   static readonly admin = {
@@ -95,6 +99,7 @@ export class PtBrMessages {
       listingInvoices: 'Consultando lista de faturas.',
       buildingEnergyDashboard: 'Montando dashboard de energia.',
       buildingFinancialDashboard: 'Montando dashboard financeiro.',
+      buildingConsolidatedDashboard: 'Montando dashboard consolidado.',
       listingMyDocuments: 'Consultando documentos do usuario.',
     },
     admin: {

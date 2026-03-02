@@ -20,6 +20,8 @@ export type InvoiceRecord = {
 export async function listInvoices(params?: {
   numeroCliente?: string;
   mesReferencia?: string;
+  periodoInicio?: string;
+  periodoFim?: string;
 }) {
   const response = await apiClient.get<ApiEnvelope<InvoiceRecord[]>>('/invoices', {
     params,
@@ -27,18 +29,34 @@ export async function listInvoices(params?: {
   return unwrapApiResponse(response.data);
 }
 
-export async function getEnergyDashboard() {
+export type ConsolidatedDashboard = {
+  consumoEnergiaEletricaKwh: number;
+  energiaCompensadaKwh: number;
+  valorTotalSemGdRs: number;
+  economiaGdRs: number;
+};
+
+export async function getConsolidatedDashboard() {
   const response = await apiClient.get<
-    ApiEnvelope<{ consumoEnergiaEletricaKwh: number; energiaCompensadaKwh: number }>
-  >('/invoices/dashboard/energy');
+    ApiEnvelope<ConsolidatedDashboard>
+  >('/invoices/dashboard/consolidated');
   return unwrapApiResponse(response.data);
 }
 
+export async function getEnergyDashboard() {
+  const consolidated = await getConsolidatedDashboard();
+  return {
+    consumoEnergiaEletricaKwh: consolidated.consumoEnergiaEletricaKwh,
+    energiaCompensadaKwh: consolidated.energiaCompensadaKwh,
+  };
+}
+
 export async function getFinancialDashboard() {
-  const response = await apiClient.get<
-    ApiEnvelope<{ valorTotalSemGdRs: number; economiaGdRs: number }>
-  >('/invoices/dashboard/financial');
-  return unwrapApiResponse(response.data);
+  const consolidated = await getConsolidatedDashboard();
+  return {
+    valorTotalSemGdRs: consolidated.valorTotalSemGdRs,
+    economiaGdRs: consolidated.economiaGdRs,
+  };
 }
 
 export async function listMyDocuments() {
@@ -54,9 +72,6 @@ export async function uploadInvoice(file: File) {
   const response = await apiClient.post<ApiEnvelope<Record<string, unknown>>>(
     '/invoices/extract',
     formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
   );
   return unwrapApiResponse(response.data);
 }

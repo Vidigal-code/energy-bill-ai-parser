@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApiLogger } from '../../../shared/logging/api-logger';
 import { PtBrMessages } from '../../../shared/messages/pt-br.messages';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import type { AppRole } from '../../auth/domain/role.type';
+import { toMonthKey } from './mes-referencia.util';
 
 type ListInvoicesQuery = {
   numeroCliente?: string;
   mesReferencia?: string;
+  periodoInicio?: string;
+  periodoFim?: string;
   page?: string;
   pageSize?: string;
   userId: string;
@@ -45,6 +48,26 @@ export class InvoicesQueryService {
       100,
       Math.max(1, Number.parseInt(query.pageSize ?? '20', 10) || 20),
     );
+    const periodoInicio = this.parsePeriodoInicio(query.periodoInicio);
+    const periodoFim = this.parsePeriodoFim(query.periodoFim);
+    this.ensurePeriodoRange(periodoInicio, periodoFim);
+    const shouldFilterByPeriod = periodoInicio !== null || periodoFim !== null;
+
+    if (!shouldFilterByPeriod) {
+      return this.prisma.invoice.findMany({
+        where: {
+          numeroCliente: query.numeroCliente,
+          mesReferencia: query.mesReferencia,
+          uploaderUserId: query.role === 'ADMIN' ? undefined : query.userId,
+        },
+        include: {
+          metrics: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+    }
 
     return this.prisma.invoice.findMany({
       where: {
@@ -56,9 +79,39 @@ export class InvoicesQueryService {
         metrics: true,
       },
       orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+    }).then((invoices) =>
+      invoices
+        .filter((invoice) =>
+          this.isInvoiceInsidePeriodo(invoice.mesReferencia, periodoInicio, periodoFim),
+        )
+        .slice((page - 1) * pageSize, page * pageSize),
+    );
+  }
+
+  async consolidatedDashboard(userId: string, role: AppRole) {
+    ApiLogger.info({
+      context: 'InvoicesQueryService',
+      message: PtBrMessages.logs.invoicesQuery.buildingConsolidatedDashboard,
     });
+    const where = role === 'ADMIN' ? {} : { invoice: { uploaderUserId: userId } };
+    const aggregate = await this.prisma.invoiceMetrics.aggregate({
+      where,
+      _sum: {
+        consumoEnergiaEletricaKwh: true,
+        energiaCompensadaKwh: true,
+        valorTotalSemGdRs: true,
+        economiaGdRs: true,
+      },
+    });
+
+    return {
+      consumoEnergiaEletricaKwh: Number(
+        aggregate._sum.consumoEnergiaEletricaKwh ?? 0,
+      ),
+      energiaCompensadaKwh: Number(aggregate._sum.energiaCompensadaKwh ?? 0),
+      valorTotalSemGdRs: Number(aggregate._sum.valorTotalSemGdRs ?? 0),
+      economiaGdRs: Number(aggregate._sum.economiaGdRs ?? 0),
+    };
   }
 
   /**
@@ -76,27 +129,12 @@ export class InvoicesQueryService {
       context: 'InvoicesQueryService',
       message: PtBrMessages.logs.invoicesQuery.buildingEnergyDashboard,
     });
-    const where = role === 'ADMIN' ? {} : { uploaderUserId: userId };
-    const invoices = await this.prisma.invoice.findMany({
-      where,
-      include: { metrics: true },
-    });
+    const consolidated = await this.consolidatedDashboard(userId, role);
 
-    return invoices.reduce(
-      (acc, invoice) => {
-        acc.consumoEnergiaEletricaKwh += Number(
-          invoice.metrics?.consumoEnergiaEletricaKwh ?? 0,
-        );
-        acc.energiaCompensadaKwh += Number(
-          invoice.metrics?.energiaCompensadaKwh ?? 0,
-        );
-        return acc;
-      },
-      {
-        consumoEnergiaEletricaKwh: 0,
-        energiaCompensadaKwh: 0,
-      },
-    );
+    return {
+      consumoEnergiaEletricaKwh: consolidated.consumoEnergiaEletricaKwh,
+      energiaCompensadaKwh: consolidated.energiaCompensadaKwh,
+    };
   }
 
   /**
@@ -114,25 +152,12 @@ export class InvoicesQueryService {
       context: 'InvoicesQueryService',
       message: PtBrMessages.logs.invoicesQuery.buildingFinancialDashboard,
     });
-    const where = role === 'ADMIN' ? {} : { uploaderUserId: userId };
-    const invoices = await this.prisma.invoice.findMany({
-      where,
-      include: { metrics: true },
-    });
+    const consolidated = await this.consolidatedDashboard(userId, role);
 
-    return invoices.reduce(
-      (acc, invoice) => {
-        acc.valorTotalSemGdRs += Number(
-          invoice.metrics?.valorTotalSemGdRs ?? 0,
-        );
-        acc.economiaGdRs += Number(invoice.metrics?.economiaGdRs ?? 0);
-        return acc;
-      },
-      {
-        valorTotalSemGdRs: 0,
-        economiaGdRs: 0,
-      },
-    );
+    return {
+      valorTotalSemGdRs: consolidated.valorTotalSemGdRs,
+      economiaGdRs: consolidated.economiaGdRs,
+    };
   }
 
   /**
@@ -162,5 +187,54 @@ export class InvoicesQueryService {
         createdAt: true,
       },
     });
+  }
+
+  private parsePeriodoInicio(value: string | undefined) {
+    if (!value) {
+      return null;
+    }
+    const parsed = toMonthKey(value);
+    if (parsed === null) {
+      throw new BadRequestException(PtBrMessages.invoices.invalidPeriodoInicio);
+    }
+    return parsed;
+  }
+
+  private parsePeriodoFim(value: string | undefined) {
+    if (!value) {
+      return null;
+    }
+    const parsed = toMonthKey(value);
+    if (parsed === null) {
+      throw new BadRequestException(PtBrMessages.invoices.invalidPeriodoFim);
+    }
+    return parsed;
+  }
+
+  private ensurePeriodoRange(
+    periodoInicio: number | null,
+    periodoFim: number | null,
+  ) {
+    if (periodoInicio !== null && periodoFim !== null && periodoInicio > periodoFim) {
+      throw new BadRequestException(PtBrMessages.invoices.invalidPeriodoRange);
+    }
+  }
+
+  private isInvoiceInsidePeriodo(
+    mesReferencia: string,
+    periodoInicio: number | null,
+    periodoFim: number | null,
+  ) {
+    const mesKey = toMonthKey(mesReferencia);
+    if (mesKey === null) {
+      return false;
+    }
+    if (periodoInicio !== null && mesKey < periodoInicio) {
+      return false;
+    }
+    if (periodoFim !== null && mesKey > periodoFim) {
+      return false;
+    }
+    return true;
   }
 }

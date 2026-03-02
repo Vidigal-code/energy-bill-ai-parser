@@ -10,6 +10,7 @@ type SuccessLogInput = BaseHttpLogInput;
 type ErrorLogInput = BaseHttpLogInput & {
   statusCode: number;
   message: string | string[];
+  error?: unknown;
 };
 
 type InfoLogInput = {
@@ -104,5 +105,9 @@ export class ApiLogger {
     this.logger.error(
       `${this.colorize('[ERROR]', this.colors.red)} ${method} ${input.path} ${input.statusCode} - ${message}`,
     );
+
+    if (input.error) {
+      this.logger.error(input.error);
+    }
   }
 }

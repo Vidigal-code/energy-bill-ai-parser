@@ -84,6 +84,12 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
+Executar suíte de testes em container (profile dedicado):
+
+```bash
+docker compose --profile test up backend-tests --build
+```
+
 Serviços principais:
 
 - Frontend: `http://localhost:3001`
@@ -103,7 +109,8 @@ Serviços principais:
 - `npm run build` em `backend`;
 - `npm run lint` em `frontend`;
 - `npm run build` em `frontend`;
-- `docker compose up --build` para infraestrutura + API + testes em container.
+- `docker compose up --build` para infraestrutura + API + frontend;
+- `docker compose --profile test up backend-tests --build` para testes em container.
 
 ## Roteiro de validação prática (fatura)
 
@@ -210,6 +217,12 @@ From repository root:
 docker compose up --build
 ```
 
+Run containerized test suite (dedicated profile):
+
+```bash
+docker compose --profile test up backend-tests --build
+```
+
 Main services:
 
 - Frontend: `http://localhost:3001`
@@ -229,7 +242,8 @@ Main services:
 - `npm run build` in `backend`;
 - `npm run lint` in `frontend`;
 - `npm run build` in `frontend`;
-- `docker compose up --build` for infrastructure + API + containerized tests.
+- `docker compose up --build` for infrastructure + API + frontend;
+- `docker compose --profile test up backend-tests --build` for containerized tests.
 
 ## Practical Invoice Validation Script
 

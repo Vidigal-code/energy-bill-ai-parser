@@ -6,9 +6,9 @@ type CardProps = {
 
 export function Card({ title, children, actions }: CardProps) {
   return (
-    <section className="rounded-xl border border-emerald-100 bg-white p-5 shadow-sm">
+    <section className="min-w-0 overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] p-5 shadow-sm">
       <header className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-emerald-900">{title}</h2>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">{title}</h2>
         {actions}
       </header>
       {children}

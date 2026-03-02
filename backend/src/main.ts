@@ -11,6 +11,22 @@ import { ApiLogger } from './shared/logging/api-logger';
 import { PtBrMessages } from './shared/messages/pt-br.messages';
 
 async function bootstrap() {
+  process.on('unhandledRejection', (r) => {
+    ApiLogger.logError({
+      path: 'unhandledRejection',
+      statusCode: 500,
+      message: 'Unhandled Promise Rejection',
+      error: r,
+    });
+  });
+  process.on('uncaughtException', (e) => {
+    ApiLogger.logError({
+      path: 'uncaughtException',
+      statusCode: 500,
+      message: 'Uncaught Exception',
+      error: e,
+    });
+  });
   ApiLogger.log({
     context: 'Bootstrap',
     message: PtBrMessages.system.bootstrapStarting,

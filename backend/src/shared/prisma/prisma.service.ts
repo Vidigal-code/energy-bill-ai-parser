@@ -10,6 +10,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       context: 'PrismaService',
       message: PtBrMessages.logs.prisma.connecting,
     });
+    ApiLogger.info({
+      context: 'PrismaConfig',
+      message: 'PRISMA CONFIG DB URL: ' + process.env.DATABASE_URL,
+    });
     await this.$connect();
   }
 

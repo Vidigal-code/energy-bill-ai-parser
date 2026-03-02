@@ -112,6 +112,8 @@ export class InvoicesController {
   @ApiOperation({ summary: 'Listar faturas com filtros' })
   @ApiQuery({ name: 'numeroCliente', required: false })
   @ApiQuery({ name: 'mesReferencia', required: false })
+  @ApiQuery({ name: 'periodoInicio', required: false })
+  @ApiQuery({ name: 'periodoFim', required: false })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'pageSize', required: false })
   @ApiOkResponse({ description: 'Lista de faturas retornada com sucesso' })
@@ -119,17 +121,28 @@ export class InvoicesController {
     @CurrentUser() user: AuthUser,
     @Query('numeroCliente') numeroCliente?: string,
     @Query('mesReferencia') mesReferencia?: string,
+    @Query('periodoInicio') periodoInicio?: string,
+    @Query('periodoFim') periodoFim?: string,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
   ) {
     return this.invoicesQueryService.listInvoices({
       numeroCliente,
       mesReferencia,
+      periodoInicio,
+      periodoFim,
       page,
       pageSize,
       userId: user.sub,
       role: user.role,
     });
+  }
+
+  @Get('dashboard/consolidated')
+  @ApiOperation({ summary: 'Consultar dashboard consolidado (energia + financeiro)' })
+  @ApiOkResponse({ description: 'Dashboard consolidado retornado com sucesso' })
+  consolidatedDashboard(@CurrentUser() user: AuthUser) {
+    return this.invoicesQueryService.consolidatedDashboard(user.sub, user.role);
   }
 
   @Get('dashboard/energy')

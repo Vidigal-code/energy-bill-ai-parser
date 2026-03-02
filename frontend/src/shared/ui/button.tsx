@@ -10,12 +10,14 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    'rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60';
+    'rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60';
 
   const styleByVariant = {
-    primary: 'bg-emerald-700 text-white hover:bg-emerald-800',
-    ghost: 'border border-emerald-700 text-emerald-800 hover:bg-emerald-50',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    primary:
+      'bg-[var(--accent)] text-[var(--accent-contrast)] hover:bg-[var(--accent-strong)]',
+    ghost:
+      'border border-[var(--border-color)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--surface-2)]',
+    danger: 'bg-[var(--danger)] text-white hover:bg-[var(--danger-strong)]',
   }[variant];
 
   return <button className={`${base} ${styleByVariant} ${className}`} {...props} />;

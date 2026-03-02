@@ -42,6 +42,16 @@ describe('Invoices extract (integration)', () => {
 
   const prismaMock = {
     invoice: { findMany: jest.fn().mockResolvedValue([]) },
+    invoiceMetrics: {
+      aggregate: jest.fn().mockResolvedValue({
+        _sum: {
+          consumoEnergiaEletricaKwh: 506,
+          energiaCompensadaKwh: 456,
+          valorTotalSemGdRs: 329.6,
+          economiaGdRs: -222.22,
+        },
+      }),
+    },
     storedDocument: { findMany: jest.fn().mockResolvedValue([]) },
     $transaction: jest.fn(
       async <T>(callback: (tx: typeof txMock) => Promise<T> | T): Promise<T> =>
@@ -72,6 +82,15 @@ describe('Invoices extract (integration)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     llmMock.extractInvoiceData.mockResolvedValue(extraction);
+    prismaMock.invoice.findMany.mockResolvedValue([]);
+    prismaMock.invoiceMetrics.aggregate.mockResolvedValue({
+      _sum: {
+        consumoEnergiaEletricaKwh: 506,
+        energiaCompensadaKwh: 456,
+        valorTotalSemGdRs: 329.6,
+        economiaGdRs: -222.22,
+      },
+    });
   });
 
   beforeAll(async () => {
@@ -188,5 +207,58 @@ describe('Invoices extract (integration)', () => {
     expect(storageMock.upload).toHaveBeenCalledTimes(1);
     expect(storageMock.remove).toHaveBeenCalledTimes(1);
     expect(auditMock.write).toHaveBeenCalledTimes(1);
+  });
+
+  it('deve listar faturas filtrando por periodo', async () => {
+    prismaMock.invoice.findMany.mockResolvedValueOnce([
+      {
+        id: 'inv_jan',
+        fileName: 'jan.pdf',
+        numeroCliente: '7204076116',
+        mesReferencia: 'JAN/2024',
+        createdAt: new Date().toISOString(),
+        metrics: {
+          consumoEnergiaEletricaKwh: 506,
+          energiaCompensadaKwh: 456,
+          valorTotalSemGdRs: 329.6,
+          economiaGdRs: -222.22,
+        },
+      },
+      {
+        id: 'inv_fev',
+        fileName: 'fev.pdf',
+        numeroCliente: '7204076116',
+        mesReferencia: 'FEV/2024',
+        createdAt: new Date().toISOString(),
+        metrics: {
+          consumoEnergiaEletricaKwh: 400,
+          energiaCompensadaKwh: 300,
+          valorTotalSemGdRs: 200,
+          economiaGdRs: -100,
+        },
+      },
+    ]);
+
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server).get(
+      '/invoices?numeroCliente=7204076116&periodoInicio=fev/2024&periodoFim=fev/2024',
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0]?.mesReferencia).toBe('FEV/2024');
+  });
+
+  it('deve retornar dashboard consolidado', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server).get('/invoices/dashboard/consolidated');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      consumoEnergiaEletricaKwh: 506,
+      energiaCompensadaKwh: 456,
+      valorTotalSemGdRs: 329.6,
+      economiaGdRs: -222.22,
+    });
   });
 });

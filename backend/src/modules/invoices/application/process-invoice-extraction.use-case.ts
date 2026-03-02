@@ -230,6 +230,14 @@ export class ProcessInvoiceExtractionUseCase {
         userAgent: input.userAgent,
       });
 
+      ApiLogger.logError({
+        path: 'invoice-extraction',
+        method: 'POST',
+        statusCode: 500,
+        message: PtBrMessages.invoices.failedToProcessInvoice,
+        error: error,
+      });
+
       throw error;
     }
   }

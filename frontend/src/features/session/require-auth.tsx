@@ -29,7 +29,7 @@ export function RequireAuth({ children, role }: RequireAuthProps) {
   }, [initialized, role, router, user]);
 
   if (!initialized || !user) {
-    return <p className="p-6 text-sm text-emerald-800">Carregando sessao...</p>;
+    return <p className="p-6 text-sm text-[var(--text-secondary)]">Carregando sessao...</p>;
   }
 
   if (role && user.role !== role) {

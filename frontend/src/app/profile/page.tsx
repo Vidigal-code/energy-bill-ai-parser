@@ -40,25 +40,29 @@ export default function ProfilePage() {
   return (
     <RequireAuth>
       <AppShell>
-        <Card title="Meu perfil">
-          <form className="flex max-w-md flex-col gap-4" onSubmit={onSubmit}>
-            <Input
-              label="Nome de usuario"
-              name="username"
-              defaultValue={user?.username}
-            />
-            <Input
-              label="Nova senha (opcional)"
-              type="password"
-              name="password"
-              placeholder="Deixe em branco para nao alterar"
-            />
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Salvando...' : 'Salvar alteracoes'}
-            </Button>
-          </form>
-          {message ? <p className="mt-4 text-sm text-emerald-800">{message}</p> : null}
-        </Card>
+        <div className="mx-auto w-full max-w-3xl">
+          <Card title="Meu perfil">
+            <form className="flex w-full flex-col gap-4" onSubmit={onSubmit}>
+              <Input
+                label="Nome de usuario"
+                name="username"
+                defaultValue={user?.username}
+              />
+              <Input
+                label="Nova senha (opcional)"
+                type="password"
+                name="password"
+                placeholder="Deixe em branco para nao alterar"
+              />
+              <Button type="submit" disabled={mutation.isPending} className="sm:w-fit">
+                {mutation.isPending ? 'Salvando...' : 'Salvar alteracoes'}
+              </Button>
+            </form>
+            {message ? (
+              <p className="mt-4 text-sm text-[var(--text-secondary)]">{message}</p>
+            ) : null}
+          </Card>
+        </div>
       </AppShell>
     </RequireAuth>
   );
