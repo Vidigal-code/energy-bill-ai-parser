@@ -55,8 +55,8 @@ export const envSchema = z.object({
   S3_ACCESS_KEY_ID: z.string().min(1).optional().default('test'),
   S3_SECRET_ACCESS_KEY: z.string().min(1).optional().default('test'),
   S3_FORCE_PATH_STYLE: booleanFlagSchema.optional().default('true'),
-  OPEN_SOURCE_IA: booleanFlagSchema.optional().default('true'),
-  LLM_PROVIDER: z.enum(LLM_PROVIDER_VALUES).optional().default('ollama'),
+  OPEN_SOURCE_IA: booleanFlagSchema.optional().default('false'),
+  LLM_PROVIDER: z.enum(LLM_PROVIDER_VALUES).optional().default('gemini'),
   OLLAMA_BASE_URL: z
     .string()
     .url()
@@ -74,7 +74,7 @@ export const envSchema = z.object({
     .url()
     .optional()
     .default('https://generativelanguage.googleapis.com/v1beta'),
-  GEMINI_MODEL: z.string().min(1).optional().default('gemini-1.5-flash'),
+  GEMINI_MODEL: z.string().min(1).optional().default('gemini-2.5-flash'),
   ANTHROPIC_BASE_URL: z
     .string()
     .url()

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 const shouldRunDbIntegration =
-  process.env.RUN_DB_INTEGRATION === 'true' &&
+  process.env.RUN_DB_INTEGRATION !== 'false' &&
   Boolean(process.env.DATABASE_URL);
 
 const describeDb = shouldRunDbIntegration ? describe : describe.skip;
@@ -46,7 +46,7 @@ describeDb('Prisma persistence (integration)', () => {
         energiaCompensadaGdiQuantidadeKwh: 456,
         energiaCompensadaGdiValorRs: -222.22,
         contribIlumPublicaMunicipalValorRs: 49.43,
-        extractionProvider: 'ollama',
+        extractionProvider: 'gemini',
         rawExtractionJson: { source: 'db-integration-test' },
       },
     });

@@ -434,9 +434,55 @@ export default function AdminPage() {
             </div>
           </Card>
           <Card title="Auditoria (admin)">
-            <pre className="max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded border border-[var(--border-color)] bg-[var(--surface-2)] p-3 text-xs text-[var(--text-primary)]">
-              {JSON.stringify(auditsQuery.data ?? [], null, 2)}
-            </pre>
+            <div className="hidden min-w-0 overflow-x-auto md:block">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-[var(--surface-2)] text-[var(--text-primary)]">
+                  <tr>
+                    <th className="px-3 py-2">Acao</th>
+                    <th className="px-3 py-2">Status</th>
+                    <th className="px-3 py-2">Usuario</th>
+                    <th className="px-3 py-2">Data</th>
+                    <th className="px-3 py-2">IP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(auditsQuery.data ?? []).map((log) => (
+                    <tr
+                      key={String(log.id)}
+                      className="border-b border-[var(--border-color)] text-[var(--text-primary)]"
+                    >
+                      <td className="px-3 py-2 break-all">{readAuditValue(log, 'action')}</td>
+                      <td className="px-3 py-2">{readAuditValue(log, 'status')}</td>
+                      <td className="px-3 py-2 break-all">{resolveAuditUsername(log)}</td>
+                      <td className="px-3 py-2">{formatDate(readAuditValue(log, 'createdAt'))}</td>
+                      <td className="px-3 py-2 break-all">{readAuditValue(log, 'ip')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="grid gap-3 md:hidden">
+              {(auditsQuery.data ?? []).map((log) => (
+                <article
+                  key={`mobile-audit-${String(log.id)}`}
+                  className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] p-3 text-sm text-[var(--text-primary)]"
+                >
+                  <p><strong>Acao:</strong> {readAuditValue(log, 'action')}</p>
+                  <p><strong>Status:</strong> {readAuditValue(log, 'status')}</p>
+                  <p className="break-all"><strong>Usuario:</strong> {resolveAuditUsername(log)}</p>
+                  <p><strong>Data:</strong> {formatDate(readAuditValue(log, 'createdAt'))}</p>
+                  <p className="break-all"><strong>IP:</strong> {readAuditValue(log, 'ip')}</p>
+                </article>
+              ))}
+            </div>
+            {auditsQuery.isLoading ? (
+              <p className="mt-3 text-sm text-[var(--text-secondary)]">Carregando auditoria...</p>
+            ) : null}
+            {!auditsQuery.isLoading && !auditsQuery.isError && (auditsQuery.data ?? []).length === 0 ? (
+              <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                Nenhum log de auditoria encontrado.
+              </p>
+            ) : null}
           </Card>
         </div>
 
@@ -516,4 +562,35 @@ export default function AdminPage() {
       </AppShell>
     </RequireAuth>
   );
+}
+
+function readAuditValue(log: Record<string, unknown>, key: string) {
+  const value = log[key];
+  if (value === null || value === undefined || value === '') {
+    return '-';
+  }
+  return String(value);
+}
+
+function resolveAuditUsername(log: Record<string, unknown>) {
+  const actor = log.actor;
+  if (typeof actor !== 'object' || actor === null) {
+    return '-';
+  }
+  const actorRecord = actor as Record<string, unknown>;
+  return String(actorRecord.username ?? '-');
+}
+
+function formatDate(value: string) {
+  if (!value || value === '-') {
+    return '-';
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
 }

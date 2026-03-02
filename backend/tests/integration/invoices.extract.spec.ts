@@ -111,8 +111,8 @@ describe('Invoices extract (integration)', () => {
               const map: Record<string, unknown> = {
                 PDF_MAX_FILE_SIZE_MB: 1,
                 S3_BUCKET: 'energy-bills',
-                OPEN_SOURCE_IA: 'true',
-                LLM_PROVIDER: 'ollama',
+                OPEN_SOURCE_IA: 'false',
+                LLM_PROVIDER: 'gemini',
               };
               return map[key];
             },
@@ -247,6 +247,55 @@ describe('Invoices extract (integration)', () => {
     expect(response.status).toBe(200);
     expect(response.body).toHaveLength(1);
     expect(response.body[0]?.mesReferencia).toBe('FEV/2024');
+  });
+
+  it('deve retornar 400 quando periodoInicio for maior que periodoFim', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server).get(
+      '/invoices?periodoInicio=mar/2024&periodoFim=jan/2024',
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  it('deve encaminhar pagina e pageSize para consulta paginada', async () => {
+    prismaMock.invoice.findMany.mockResolvedValueOnce([
+      {
+        id: 'inv_1',
+        fileName: 'fatura-1.pdf',
+        numeroCliente: '7204076116',
+        mesReferencia: 'JAN/2024',
+        createdAt: new Date().toISOString(),
+        metrics: undefined,
+      },
+      {
+        id: 'inv_2',
+        fileName: 'fatura-2.pdf',
+        numeroCliente: '7204076116',
+        mesReferencia: 'FEV/2024',
+        createdAt: new Date().toISOString(),
+        metrics: undefined,
+      },
+      {
+        id: 'inv_3',
+        fileName: 'fatura-3.pdf',
+        numeroCliente: '7204076116',
+        mesReferencia: 'MAR/2024',
+        createdAt: new Date().toISOString(),
+        metrics: undefined,
+      },
+    ]);
+
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server).get('/invoices?page=2&pageSize=1');
+
+    expect(response.status).toBe(200);
+    expect(prismaMock.invoice.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 1,
+        take: 1,
+      }),
+    );
   });
 
   it('deve retornar dashboard consolidado', async () => {

@@ -15,6 +15,7 @@ import {
 } from '@/entities/invoice/api/invoice.client';
 
 export default function InvoicesPage() {
+  const pageSize = 10;
   const queryClient = useQueryClient();
   const [numeroClienteInput, setNumeroClienteInput] = useState('');
   const [periodoInicioInput, setPeriodoInicioInput] = useState('');
@@ -25,6 +26,8 @@ export default function InvoicesPage() {
     periodoFim: '',
   });
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
+  const [page, setPage] = useState(1);
 
   const invoicesQuery = useQuery({
     queryKey: [
@@ -32,12 +35,16 @@ export default function InvoicesPage() {
       filters.numeroCliente,
       filters.periodoInicio,
       filters.periodoFim,
+      page,
+      pageSize,
     ],
     queryFn: () =>
       listInvoices({
         numeroCliente: filters.numeroCliente || undefined,
         periodoInicio: filters.periodoInicio || undefined,
         periodoFim: filters.periodoFim || undefined,
+        page,
+        pageSize,
       }),
   });
 
@@ -50,29 +57,35 @@ export default function InvoicesPage() {
     mutationFn: uploadInvoice,
     onSuccess: () => {
       setMessage('Arquivo processado com sucesso.');
+      setMessageType('success');
       void queryClient.invalidateQueries({ queryKey: ['invoices'] });
       void queryClient.invalidateQueries({ queryKey: ['my-documents'] });
     },
     onError: (err) => {
       setMessage(err instanceof Error ? err.message : 'Falha ao processar arquivo.');
+      setMessageType('error');
     },
   });
 
   function handleUpload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage('');
+    setMessageType('info');
     const form = new FormData(event.currentTarget);
     const file = form.get('file');
     if (!(file instanceof File)) {
       setMessage('Selecione um arquivo PDF.');
+      setMessageType('error');
       return;
     }
     if (file.type !== 'application/pdf') {
       setMessage('Apenas arquivos PDF sao suportados.');
+      setMessageType('error');
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
       setMessage('Arquivo excede o limite de 50MB.');
+      setMessageType('error');
       return;
     }
     uploadMutation.mutate(file);
@@ -80,11 +93,19 @@ export default function InvoicesPage() {
 
   function handleApplyFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const inicioKey = toMonthKey(periodoInicioInput);
+    const fimKey = toMonthKey(periodoFimInput);
+    if (inicioKey !== null && fimKey !== null && inicioKey > fimKey) {
+      setMessage('Periodo invalido: o inicio deve ser menor ou igual ao fim.');
+      setMessageType('error');
+      return;
+    }
     setFilters({
       numeroCliente: numeroClienteInput.trim(),
       periodoInicio: periodoInicioInput.trim(),
       periodoFim: periodoFimInput.trim(),
     });
+    setPage(1);
   }
 
   function handleClearFilters() {
@@ -92,6 +113,19 @@ export default function InvoicesPage() {
     setPeriodoInicioInput('');
     setPeriodoFimInput('');
     setFilters({ numeroCliente: '', periodoInicio: '', periodoFim: '' });
+    setPage(1);
+    setMessage('');
+    setMessageType('info');
+  }
+
+  function renderMessageClass() {
+    if (messageType === 'error') {
+      return 'mt-3 text-sm text-[var(--danger)]';
+    }
+    if (messageType === 'success') {
+      return 'mt-3 text-sm text-[var(--accent-strong)]';
+    }
+    return 'mt-3 text-sm text-[var(--text-secondary)]';
   }
 
   return (
@@ -109,7 +143,7 @@ export default function InvoicesPage() {
               </Button>
             </form>
             {message ? (
-              <p className="mt-3 text-sm text-[var(--text-secondary)]">{message}</p>
+              <p className={renderMessageClass()}>{message}</p>
             ) : null}
           </Card>
 
@@ -141,7 +175,7 @@ export default function InvoicesPage() {
               </div>
             </form>
             {invoicesQuery.isError ? (
-              <p className="mb-3 text-sm text-red-700">
+              <p className="mb-3 text-sm text-[var(--danger)]">
                 {invoicesQuery.error instanceof Error
                   ? invoicesQuery.error.message
                   : 'Falha ao carregar as faturas.'}
@@ -187,22 +221,115 @@ export default function InvoicesPage() {
                 Nenhuma fatura encontrada para os filtros informados.
               </p>
             ) : null}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded border border-[var(--border-color)] bg-[var(--surface-2)] p-2 text-sm text-[var(--text-primary)]">
+              <span>Pagina atual: {page}</span>
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="ghost" disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
+                  Pagina anterior
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={invoicesQuery.isLoading || (invoicesQuery.data ?? []).length < pageSize}
+                  onClick={() => setPage((current) => current + 1)}
+                >
+                  Proxima pagina
+                </Button>
+              </div>
+            </div>
           </Card>
 
           <Card title="Meus documentos enviados">
             {docsQuery.isError ? (
-              <p className="mb-3 text-sm text-red-700">
+              <p className="mb-3 text-sm text-[var(--danger)]">
                 {docsQuery.error instanceof Error
                   ? docsQuery.error.message
                   : 'Falha ao carregar documentos.'}
               </p>
             ) : null}
-            <pre className="max-w-full overflow-x-auto whitespace-pre-wrap break-all rounded border border-[var(--border-color)] bg-[var(--surface-2)] p-3 text-xs text-[var(--text-primary)]">
-              {JSON.stringify(docsQuery.data ?? [], null, 2)}
-            </pre>
+            <div className="hidden min-w-0 overflow-x-auto md:block">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-[var(--surface-2)] text-[var(--text-primary)]">
+                  <tr>
+                    <th className="px-3 py-2">Arquivo</th>
+                    <th className="px-3 py-2">Tipo</th>
+                    <th className="px-3 py-2">Tamanho</th>
+                    <th className="px-3 py-2">Criado em</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(docsQuery.data ?? []).map((doc) => (
+                    <tr key={doc.id} className="border-b border-[var(--border-color)]">
+                      <td className="px-3 py-2 break-all">{doc.fileName}</td>
+                      <td className="px-3 py-2 break-all">{doc.mimeType}</td>
+                      <td className="px-3 py-2">{formatBytes(doc.sizeBytes)}</td>
+                      <td className="px-3 py-2">{formatDate(doc.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="grid gap-3 md:hidden">
+              {(docsQuery.data ?? []).map((doc) => (
+                <article
+                  key={`mobile-doc-${doc.id}`}
+                  className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] p-3 text-sm text-[var(--text-primary)]"
+                >
+                  <p className="break-all"><strong>Arquivo:</strong> {doc.fileName}</p>
+                  <p className="break-all"><strong>Tipo:</strong> {doc.mimeType}</p>
+                  <p><strong>Tamanho:</strong> {formatBytes(doc.sizeBytes)}</p>
+                  <p><strong>Criado em:</strong> {formatDate(doc.createdAt)}</p>
+                </article>
+              ))}
+            </div>
+            {docsQuery.isLoading ? (
+              <p className="mt-3 text-sm text-[var(--text-secondary)]">Carregando documentos...</p>
+            ) : null}
+            {!docsQuery.isLoading && !docsQuery.isError && (docsQuery.data ?? []).length === 0 ? (
+              <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                Nenhum documento enviado ate o momento.
+              </p>
+            ) : null}
           </Card>
         </div>
       </AppShell>
     </RequireAuth>
   );
+}
+
+function toMonthKey(value: string) {
+  if (!value) {
+    return null;
+  }
+  const [year, month] = value.split('-');
+  if (!year || !month) {
+    return null;
+  }
+  const parsedYear = Number.parseInt(year, 10);
+  const parsedMonth = Number.parseInt(month, 10);
+  if (!Number.isFinite(parsedYear) || !Number.isFinite(parsedMonth)) {
+    return null;
+  }
+  return parsedYear * 100 + parsedMonth;
+}
+
+function formatBytes(bytes: number) {
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return '0 B';
+  }
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / 1024 ** exponent;
+  return `${value.toFixed(value >= 10 || exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+}
+
+function formatDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
 }

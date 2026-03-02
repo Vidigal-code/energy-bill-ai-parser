@@ -30,6 +30,11 @@ export class OpenAiExtractor implements ILlmExtractor {
   async extractInvoiceData(
     input: ExtractInvoiceInput,
   ): Promise<InvoiceExtraction> {
+    ApiLogger.warning({
+      context: 'OpenAiExtractor',
+      message:
+        'Provider OpenAI esta operando em modo de contexto textual com PDF em base64. Para requisito estrito de PDF nativo, utilize Gemini ou Claude.',
+    });
     const prompt = buildExtractionInstructions({
       extractionPrompt: this.config.extractionPrompt,
       extractionReference: this.config.extractionReference,

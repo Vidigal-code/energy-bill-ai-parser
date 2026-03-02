@@ -22,6 +22,8 @@ export async function listInvoices(params?: {
   mesReferencia?: string;
   periodoInicio?: string;
   periodoFim?: string;
+  page?: number;
+  pageSize?: number;
 }) {
   const response = await apiClient.get<ApiEnvelope<InvoiceRecord[]>>('/invoices', {
     params,
@@ -60,11 +62,21 @@ export async function getFinancialDashboard() {
 }
 
 export async function listMyDocuments() {
-  const response = await apiClient.get<ApiEnvelope<Record<string, unknown>[]>>(
+  const response = await apiClient.get<ApiEnvelope<DocumentRecord[]>>(
     '/invoices/my-documents',
   );
   return unwrapApiResponse(response.data);
 }
+
+export type DocumentRecord = {
+  id: string;
+  invoiceId: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  checksum: string;
+  createdAt: string;
+};
 
 export async function uploadInvoice(file: File) {
   const formData = new FormData();

@@ -101,6 +101,13 @@ Configuração por ambiente:
 - Upload: `PDF_MAX_FILE_SIZE_MB`
 - Storage: `STORAGE_DRIVER`, `S3_REGION`, `S3_BUCKET`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_FORCE_PATH_STYLE`, `JWE_SECRET`
 
+Defaults recomendados do desafio (sem alterar `.env`):
+
+- `OPEN_SOURCE_IA=false`
+- `LLM_PROVIDER=gemini`
+- `GEMINI_MODEL=gemini-2.5-flash`
+- `OPENAI` permanece como provider alternativo, mas no momento usa contexto textual com PDF em base64 (nao envio nativo de `application/pdf`).
+
 ## Execução local
 
 ```bash
@@ -118,10 +125,10 @@ npm run test:integration
 npm run test
 ```
 
-Teste opcional com persistência real no banco (Postgres):
+Teste de persistência real no banco (Postgres) quando `DATABASE_URL` estiver configurada:
 
 ```bash
-RUN_DB_INTEGRATION=true npm run test:integration
+npm run test:integration
 ```
 
 ## Swagger (OpenAPI)
@@ -283,6 +290,13 @@ Environment-driven settings:
 - Upload: `PDF_MAX_FILE_SIZE_MB`
 - Storage: `STORAGE_DRIVER`, `S3_REGION`, `S3_BUCKET`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_FORCE_PATH_STYLE`, `JWE_SECRET`
 
+Recommended default challenge profile (without overriding `.env`):
+
+- `OPEN_SOURCE_IA=false`
+- `LLM_PROVIDER=gemini`
+- `GEMINI_MODEL=gemini-2.5-flash`
+- `OPENAI` remains an alternative provider, but currently runs in text-context mode with PDF base64 (not native `application/pdf` upload).
+
 ## Local Run
 
 ```bash
@@ -292,10 +306,10 @@ npm run build
 npm run start:dev
 ```
 
-Optional real-database integration check (Postgres):
+Real database integration check (Postgres) when `DATABASE_URL` is configured:
 
 ```bash
-RUN_DB_INTEGRATION=true npm run test:integration
+npm run test:integration
 ```
 
 Useful endpoints:
