@@ -20,6 +20,15 @@ import type { AuthUser } from '../../auth/domain/auth-user.type';
 import type { Request } from 'express';
 import { InvoicesQueryService } from '../application/invoices-query.service';
 import { PtBrMessages } from '../../../shared/messages/pt-br.messages';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 type UploadedPdfFile = {
   originalname: string;
@@ -28,6 +37,8 @@ type UploadedPdfFile = {
 };
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiTags('Invoices')
+@ApiBearerAuth()
 @Controller('invoices')
 export class InvoicesController {
   constructor(
@@ -37,6 +48,18 @@ export class InvoicesController {
 
   @Post('extract')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Enviar PDF e processar extração da fatura' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Fatura processada com sucesso' })
   async extractInvoice(
     @UploadedFile() file: UploadedPdfFile | undefined,
     @CurrentUser() user: AuthUser,
@@ -65,6 +88,12 @@ export class InvoicesController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar faturas com filtros' })
+  @ApiQuery({ name: 'numeroCliente', required: false })
+  @ApiQuery({ name: 'mesReferencia', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'pageSize', required: false })
+  @ApiOkResponse({ description: 'Lista de faturas retornada com sucesso' })
   listInvoices(
     @CurrentUser() user: AuthUser,
     @Query('numeroCliente') numeroCliente?: string,
@@ -83,16 +112,24 @@ export class InvoicesController {
   }
 
   @Get('dashboard/energy')
+  @ApiOperation({ summary: 'Consultar dashboard de energia (kWh)' })
+  @ApiOkResponse({ description: 'Dashboard de energia retornado com sucesso' })
   energyDashboard(@CurrentUser() user: AuthUser) {
     return this.invoicesQueryService.energyDashboard(user.sub, user.role);
   }
 
   @Get('dashboard/financial')
+  @ApiOperation({ summary: 'Consultar dashboard financeiro (R$)' })
+  @ApiOkResponse({
+    description: 'Dashboard financeiro retornado com sucesso',
+  })
   financialDashboard(@CurrentUser() user: AuthUser) {
     return this.invoicesQueryService.financialDashboard(user.sub, user.role);
   }
 
   @Get('my-documents')
+  @ApiOperation({ summary: 'Listar documentos do usuário autenticado' })
+  @ApiOkResponse({ description: 'Documentos retornados com sucesso' })
   myDocuments(@CurrentUser() user: AuthUser) {
     return this.invoicesQueryService.listMyDocuments(user.sub);
   }

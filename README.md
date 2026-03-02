@@ -50,6 +50,8 @@ Configuração principal via variáveis de ambiente:
 
 - Rotas protegidas por autenticação global (exceto rotas públicas de auth/health).
 - RBAC com `ADMIN` e `USER`.
+- Helmet com políticas globais de cabeçalho HTTP.
+- Rate limit global com `@nestjs/throttler`.
 - Respostas centralizadas em formato padrão (`success/error`).
 - Mensagens e logs centralizados em `backend/src/shared/messages/pt-br.messages.ts`.
 - Logger sem `console`, com níveis (`LOG`, `INFO`, `WARNING`, `SUCCESS`, `ERROR`).
@@ -69,9 +71,16 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
+Para executar a suíte de testes em container:
+
+```bash
+docker compose --profile test up --build backend-tests
+```
+
 Serviços principais:
 
 - API: `http://localhost:3000`
+- Swagger: `http://localhost:3000/api/docs`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
 - Ollama: `http://localhost:11434`
@@ -127,6 +136,8 @@ Main environment-driven extraction settings:
 
 - Global authentication on app routes (except public auth/health endpoints).
 - RBAC with `ADMIN` and `USER`.
+- Helmet global HTTP header policies.
+- Global rate limiting via `@nestjs/throttler`.
 - Centralized API response format (`success/error`).
 - Centralized messages and logs in `backend/src/shared/messages/pt-br.messages.ts`.
 - Logger levels (`LOG`, `INFO`, `WARNING`, `SUCCESS`, `ERROR`) without `console`.
@@ -146,9 +157,16 @@ From repository root:
 docker compose up --build
 ```
 
+To run the test suite in containers:
+
+```bash
+docker compose --profile test up --build backend-tests
+```
+
 Main services:
 
 - API: `http://localhost:3000`
+- Swagger: `http://localhost:3000/api/docs`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
 - Ollama: `http://localhost:11434`

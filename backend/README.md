@@ -84,10 +84,13 @@ Configuração por ambiente:
 - Refresh token com rotação e persistência.
 - Criptografia de arquivos com JWE.
 - Auditoria de ações sensíveis.
+- Políticas de cabeçalho HTTP com Helmet.
+- Rate limit global com `@nestjs/throttler`.
 
 ## Principais variáveis de ambiente
 
 - Core: `NODE_ENV`, `PORT`, `DATABASE_URL`, `LOGS`
+- API security: `HELMET_ENABLED`, `RATE_LIMIT_TTL_MS`, `RATE_LIMIT_LIMIT`
 - Auth: `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `JWT_ACCESS_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`, `JWT_ISSUER`
 - RBAC/admin inicial: `DEFAULT_ADMIN_EMAIL`, `DEFAULT_ADMIN_USERNAME`, `DEFAULT_ADMIN_PASSWORD`
 - LLM: `OPEN_SOURCE_IA`, `LLM_PROVIDER`, `OLLAMA_*`, `OPENAI_*`, `GEMINI_*`, `ANTHROPIC_*`
@@ -103,6 +106,21 @@ npm run lint
 npm run build
 npm run start:dev
 ```
+
+## TDD (unitário + integração)
+
+```bash
+npm run test:unit
+npm run test:integration
+npm run test
+```
+
+## Swagger (OpenAPI)
+
+- URL padrão: `http://localhost:3000/api/docs`
+- Configuração por env:
+  - `SWAGGER_ENABLED=true|false`
+  - `SWAGGER_PATH=api/docs`
 
 Endpoints úteis:
 
@@ -202,10 +220,13 @@ Environment-driven settings:
 - Refresh token rotation with persistence.
 - JWE encrypted file storage.
 - Sensitive action auditing.
+- HTTP header policies with Helmet.
+- Global rate limiting with `@nestjs/throttler`.
 
 ## Main Environment Variables
 
 - Core: `NODE_ENV`, `PORT`, `DATABASE_URL`, `LOGS`
+- API security: `HELMET_ENABLED`, `RATE_LIMIT_TTL_MS`, `RATE_LIMIT_LIMIT`
 - Auth: `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `JWT_ACCESS_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN`, `JWT_ISSUER`
 - Default admin: `DEFAULT_ADMIN_EMAIL`, `DEFAULT_ADMIN_USERNAME`, `DEFAULT_ADMIN_PASSWORD`
 - LLM: `OPEN_SOURCE_IA`, `LLM_PROVIDER`, `OLLAMA_*`, `OPENAI_*`, `GEMINI_*`, `ANTHROPIC_*`
@@ -233,5 +254,25 @@ Useful endpoints:
 - `GET /api/invoices/dashboard/energy`
 - `GET /api/invoices/dashboard/financial`
 - `GET /api/admin/*` (ADMIN only)
+
+## Docker (API + infraestrutura + modelo Ollama)
+
+Na raiz do repositório:
+
+```bash
+docker compose up --build
+```
+
+Fluxo de orquestração:
+
+- `postgres`, `localstack` e `ollama` sobem primeiro;
+- `ollama-init` puxa automaticamente o modelo definido em `OLLAMA_MODEL`;
+- `backend` só inicia depois do pull do modelo e aplica `prisma db push` no startup.
+
+## Docker (testes)
+
+```bash
+docker compose --profile test up --build backend-tests
+```
 
 </details>

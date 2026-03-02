@@ -21,6 +21,16 @@ export const envSchema = z.object({
     .optional()
     .default('development'),
   PORT: z.coerce.number().int().positive().optional().default(3000),
+  HELMET_ENABLED: booleanFlagSchema.optional().default('true'),
+  RATE_LIMIT_TTL_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .default(60000),
+  RATE_LIMIT_LIMIT: z.coerce.number().int().positive().optional().default(100),
+  SWAGGER_ENABLED: booleanFlagSchema.optional().default('true'),
+  SWAGGER_PATH: z.string().min(1).optional().default('api/docs'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_ACCESS_SECRET: z.string().min(1, 'JWT_ACCESS_SECRET is required'),
   JWT_REFRESH_SECRET: z.string().min(1, 'JWT_REFRESH_SECRET is required'),
