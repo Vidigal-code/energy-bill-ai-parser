@@ -17,33 +17,33 @@ services:
       timeout: 5s
       retries: 5
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ebill_ollama
-    restart: unless-stopped
-    ports:
-      - '11434:11434'
-    volumes:
-      - ollama_data:/root/.ollama
-    healthcheck:
-      test: ['CMD-SHELL', 'ollama --version || exit 1']
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  ollama-init:
-    image: curlimages/curl:8.10.1
-    container_name: ebill_ollama_init
-    restart: 'no'
-    environment:
-      OLLAMA_HOST: http://ollama:11434
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2-vision}
-    volumes:
-      - ./docker/ollama/init-model.sh:/scripts/init-model.sh:ro
-    entrypoint: ['/bin/sh', '/scripts/init-model.sh']
-    depends_on:
-      ollama:
-        condition: service_started
+#  ollama:
+#    image: ollama/ollama:latest
+#    container_name: ebill_ollama
+#    restart: unless-stopped
+#    ports:
+#      - '11434:11434'
+#    volumes:
+#      - ollama_data:/root/.ollama
+#    healthcheck:
+#      test: ['CMD-SHELL', 'ollama --version || exit 1']
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#
+#  ollama-init:
+#    image: curlimages/curl:8.10.1
+#    container_name: ebill_ollama_init
+#    restart: 'no'
+#    environment:
+#      OLLAMA_HOST: http://ollama:11434
+#      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2-vision}
+#    volumes:
+#      - ./docker/ollama/init-model.sh:/scripts/init-model.sh:ro
+#    entrypoint: ['/bin/sh', '/scripts/init-model.sh']
+#    depends_on:
+#      ollama:
+#        condition: service_started
 
   localstack:
     image: localstack/localstack:latest
@@ -71,8 +71,9 @@ services:
     environment:
       DATABASE_URL: postgresql://energy:energy@postgres:5432/energy_bill?schema=public
       OLLAMA_BASE_URL: http://ollama:11434
-      OPEN_SOURCE_IA: 'true'
-      LLM_PROVIDER: ollama
+      OPEN_SOURCE_IA: 'false'
+      LLM_PROVIDER: 'gemini'
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       STORAGE_DRIVER: localstack
       S3_ENDPOINT: http://localstack:4566
       S3_BUCKET: energy-bills
@@ -86,12 +87,34 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      ollama-init:
-        condition: service_completed_successfully
+#      ollama-init:
+#        condition: service_completed_successfully
       localstack:
         condition: service_started
     healthcheck:
       test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/api/health || exit 1']
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ebill_frontend
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      BACKEND_API_URL: http://backend:3000
+      NEXT_PUBLIC_BACKEND_API_URL: http://localhost:3000
+    ports:
+      - '${FRONTEND_PORT:-3001}:3000'
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/login || exit 1']
       interval: 20s
       timeout: 5s
       retries: 10
@@ -112,10 +135,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    profiles:
-      - test
 
 volumes:
   postgres_data:
-  ollama_data:
+#  ollama_data:
   localstack_data:

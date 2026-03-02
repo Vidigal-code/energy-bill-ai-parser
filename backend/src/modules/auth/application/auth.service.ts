@@ -25,6 +25,15 @@ type SessionContext = {
 };
 
 @Injectable()
+/**
+ *
+ * EN: Authentication application service responsible for identity lifecycle and token security.
+ *
+ * PT: Servico de aplicacao de autenticacao responsavel pelo ciclo de identidade e seguranca de tokens.
+ *
+ * @params Domain DTOs and request session metadata.
+ * @returns Authenticated session payloads and profile operations.
+ */
 export class AuthService implements OnModuleInit {
   constructor(
     private readonly prisma: PrismaService,
@@ -32,10 +41,29 @@ export class AuthService implements OnModuleInit {
     private readonly configService: ConfigService,
   ) {}
 
+  /**
+   *
+   * EN: Initializes startup routines for authentication module.
+   *
+   * PT: Inicializa rotinas de bootstrap do modulo de autenticacao.
+   *
+   * @params none
+   * @returns Promise resolved after default admin verification.
+   */
   async onModuleInit(): Promise<void> {
     await this.ensureDefaultAdmin();
   }
 
+  /**
+   *
+   * EN: Registers a new user and issues first token pair.
+   *
+   * PT: Registra novo usuario e emite o primeiro par de tokens.
+   *
+   * @params input Registration DTO payload.
+   * @params context Request metadata (IP and user-agent).
+   * @returns Access/refresh tokens and authenticated user snapshot.
+   */
   async register(input: RegisterDto, context: SessionContext) {
     ApiLogger.info({
       context: 'AuthService',
@@ -89,6 +117,16 @@ export class AuthService implements OnModuleInit {
     );
   }
 
+  /**
+   *
+   * EN: Authenticates existing user credentials and issues token pair.
+   *
+   * PT: Autentica credenciais existentes e emite par de tokens.
+   *
+   * @params input Login DTO payload.
+   * @params context Request metadata (IP and user-agent).
+   * @returns Access/refresh tokens and authenticated user snapshot.
+   */
   async login(input: LoginDto, context: SessionContext) {
     ApiLogger.info({
       context: 'AuthService',
@@ -131,6 +169,16 @@ export class AuthService implements OnModuleInit {
     );
   }
 
+  /**
+   *
+   * EN: Rotates refresh token and returns a new authenticated session.
+   *
+   * PT: Faz rotacao de refresh token e retorna nova sessao autenticada.
+   *
+   * @params input Refresh token DTO payload.
+   * @params context Request metadata (IP and user-agent).
+   * @returns Renewed access/refresh token pair.
+   */
   async refresh(input: RefreshTokenDto, context: SessionContext) {
     ApiLogger.info({
       context: 'AuthService',
@@ -173,6 +221,16 @@ export class AuthService implements OnModuleInit {
     );
   }
 
+  /**
+   *
+   * EN: Revokes current refresh token and closes active session.
+   *
+   * PT: Revoga o refresh token atual e encerra a sessao ativa.
+   *
+   * @params input Refresh token DTO payload.
+   * @params actorUserId Authenticated actor identifier.
+   * @returns Standardized logout success message.
+   */
   async logout(input: RefreshTokenDto, actorUserId: string) {
     ApiLogger.info({
       context: 'AuthService',
@@ -208,6 +266,15 @@ export class AuthService implements OnModuleInit {
     return { message: PtBrMessages.auth.logoutSuccess };
   }
 
+  /**
+   *
+   * EN: Returns authenticated user profile for self-management.
+   *
+   * PT: Retorna perfil do usuario autenticado para auto gerenciamento.
+   *
+   * @params userId Authenticated user identifier.
+   * @returns Basic profile fields.
+   */
   async me(userId: string) {
     ApiLogger.info({
       context: 'AuthService',
@@ -230,6 +297,16 @@ export class AuthService implements OnModuleInit {
     return user;
   }
 
+  /**
+   *
+   * EN: Updates authenticated user profile data.
+   *
+   * PT: Atualiza dados de perfil do usuario autenticado.
+   *
+   * @params userId Authenticated user identifier.
+   * @params input Update profile DTO payload.
+   * @returns Updated profile projection.
+   */
   async updateProfile(userId: string, input: UpdateProfileDto) {
     ApiLogger.info({
       context: 'AuthService',

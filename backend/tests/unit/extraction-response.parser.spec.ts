@@ -6,21 +6,19 @@ describe('parseInvoiceExtractionFromText', () => {
     const parsed = parseInvoiceExtractionFromText(`
 \`\`\`json
 {
-  "numeroCliente": "7204076116",
-  "mesReferencia": "JAN/2024",
-  "itensFatura": {
-    "energiaEletrica": { "quantidadeKwh": 50, "valorRs": 47.75 },
-    "energiaSceeSemIcms": { "quantidadeKwh": 456, "valorRs": 232.42 },
-    "energiaCompensadaGdi": { "quantidadeKwh": 456, "valorRs": -222.22 },
-    "contribIlumPublicaMunicipal": { "valorRs": 49.43 }
-  }
+  "Nº DO CLIENTE": "7204076116",
+  "Mês de referência": "JAN/2024",
+  "Energia Elétrica": { "Quantidade (kWh)": 50, "Valor (R$)": 47.75 },
+  "Energia SCEEE s/ICMS": { "Quantidade (kWh)": 456, "Valor (R$)": 232.42 },
+  "Energia compensada GD I": { "Quantidade (kWh)": 456, "Valor (R$)": -222.22 },
+  "Contrib Ilum Publica Municipal": { "Valor (R$)": 49.43 }
 }
 \`\`\`
 `);
 
-    expect(parsed.numeroCliente).toBe('7204076116');
-    expect(parsed.mesReferencia).toBe('JAN/2024');
-    expect(parsed.itensFatura.energiaEletrica.quantidadeKwh).toBe(50);
+    expect(parsed['Nº DO CLIENTE']).toBe('7204076116');
+    expect(parsed['Mês de referência']).toBe('JAN/2024');
+    expect(parsed['Energia Elétrica']['Quantidade (kWh)']).toBe(50);
   });
 
   it('deve lançar BadGatewayException para payload inválido', () => {

@@ -14,9 +14,27 @@ type ListInvoicesQuery = {
 };
 
 @Injectable()
+/**
+ *
+ * EN: Query-focused service for invoice listing and dashboard aggregation.
+ *
+ * PT: Servico focado em consultas de faturas e agregacao de dashboards.
+ *
+ * @params Query filters and authenticated user scope.
+ * @returns Role-aware invoice and dashboard projections.
+ */
 export class InvoicesQueryService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   *
+   * EN: Returns paginated invoices respecting role-aware visibility rules.
+   *
+   * PT: Retorna faturas paginadas respeitando regras de visibilidade por papel.
+   *
+   * @params query Filters, pagination and authenticated user context.
+   * @returns Invoice list with metric relation included.
+   */
   listInvoices(query: ListInvoicesQuery) {
     ApiLogger.info({
       context: 'InvoicesQueryService',
@@ -43,6 +61,16 @@ export class InvoicesQueryService {
     });
   }
 
+  /**
+   *
+   * EN: Aggregates energy dashboard values for current scope.
+   *
+   * PT: Agrega os valores do dashboard de energia no escopo atual.
+   *
+   * @params userId Authenticated user identifier.
+   * @params role Authenticated user role.
+   * @returns Consolidated energy indicators.
+   */
   async energyDashboard(userId: string, role: AppRole) {
     ApiLogger.info({
       context: 'InvoicesQueryService',
@@ -71,6 +99,16 @@ export class InvoicesQueryService {
     );
   }
 
+  /**
+   *
+   * EN: Aggregates financial dashboard values for current scope.
+   *
+   * PT: Agrega os valores do dashboard financeiro no escopo atual.
+   *
+   * @params userId Authenticated user identifier.
+   * @params role Authenticated user role.
+   * @returns Consolidated financial indicators.
+   */
   async financialDashboard(userId: string, role: AppRole) {
     ApiLogger.info({
       context: 'InvoicesQueryService',
@@ -97,6 +135,15 @@ export class InvoicesQueryService {
     );
   }
 
+  /**
+   *
+   * EN: Lists documents uploaded by the authenticated user.
+   *
+   * PT: Lista documentos enviados pelo usuario autenticado.
+   *
+   * @params userId Authenticated user identifier.
+   * @returns Document metadata collection.
+   */
   listMyDocuments(userId: string) {
     ApiLogger.info({
       context: 'InvoicesQueryService',

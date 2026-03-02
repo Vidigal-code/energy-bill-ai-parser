@@ -31,9 +31,27 @@ import {
 @ApiTags('Admin')
 @ApiBearerAuth()
 @Controller('admin')
+/**
+ *
+ * EN: Administrative controller exposing full governance endpoints for privileged users.
+ *
+ * PT: Controller administrativo que expoe endpoints de governanca completa para usuarios privilegiados.
+ *
+ * @params Request decorators and DTO payloads from HTTP layer.
+ * @returns Standardized API responses from application services.
+ */
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  /**
+   *
+   * EN: Lists all users for administrative control panel.
+   *
+   * PT: Lista todos os usuarios para o painel de controle administrativo.
+   *
+   * @params none
+   * @returns Collection of users and account metadata.
+   */
   @Get('users')
   @ApiOperation({ summary: 'Listar usuários (admin)' })
   @ApiOkResponse({ description: 'Usuários listados com sucesso' })

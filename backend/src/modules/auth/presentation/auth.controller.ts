@@ -30,9 +30,29 @@ import { RolesGuard } from './guards/roles.guard';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Auth')
 @Controller('auth')
+/**
+ *
+ * EN: Authentication controller exposing register/login/refresh/logout and self-profile endpoints.
+ *
+ * PT: Controller de autenticacao com endpoints de registro/login/refresh/logout e auto perfil.
+ *
+ * @params Request decorators and auth DTO payloads from HTTP layer.
+ * @returns Standardized API responses from auth application service.
+ */
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   *
+   * EN: Public endpoint to register a new user and start authenticated session.
+   *
+   * PT: Endpoint publico para registrar novo usuario e iniciar sessao autenticada.
+   *
+   * @params body Registration payload.
+   * @params ip Request IP address.
+   * @params request Raw request metadata.
+   * @returns Session tokens and user data.
+   */
   @Public()
   @Post('register')
   @ApiOperation({ summary: 'Registrar usuário' })
@@ -49,6 +69,17 @@ export class AuthController {
     });
   }
 
+  /**
+   *
+   * EN: Public endpoint to authenticate user credentials.
+   *
+   * PT: Endpoint publico para autenticar credenciais do usuario.
+   *
+   * @params body Login payload.
+   * @params ip Request IP address.
+   * @params request Raw request metadata.
+   * @returns Session tokens and user data.
+   */
   @Public()
   @Post('login')
   @ApiOperation({ summary: 'Autenticar usuário' })
@@ -61,6 +92,17 @@ export class AuthController {
     });
   }
 
+  /**
+   *
+   * EN: Public endpoint to rotate refresh token and keep session active.
+   *
+   * PT: Endpoint publico para rotacionar refresh token e manter sessao ativa.
+   *
+   * @params body Refresh token payload.
+   * @params ip Request IP address.
+   * @params request Raw request metadata.
+   * @returns Renewed session token pair.
+   */
   @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Gerar novo access token via refresh token' })

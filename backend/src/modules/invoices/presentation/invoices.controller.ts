@@ -40,12 +40,33 @@ type UploadedPdfFile = {
 @ApiTags('Invoices')
 @ApiBearerAuth()
 @Controller('invoices')
+/**
+ *
+ * EN: Invoices controller for upload, query and dashboard endpoints.
+ *
+ * PT: Controller de faturas para endpoints de upload, consulta e dashboards.
+ *
+ * @params Request decorators and DTO/query payloads from HTTP layer.
+ * @returns Standardized API responses from invoice application services.
+ */
 export class InvoicesController {
   constructor(
     private readonly processInvoiceExtractionUseCase: ProcessInvoiceExtractionUseCase,
     private readonly invoicesQueryService: InvoicesQueryService,
   ) {}
 
+  /**
+   *
+   * EN: Receives invoice PDF upload and starts extraction workflow.
+   *
+   * PT: Recebe upload de fatura PDF e inicia o fluxo de extracao.
+   *
+   * @params file Uploaded file descriptor from multipart request.
+   * @params user Authenticated user context.
+   * @params ip Request IP address.
+   * @params request Raw request metadata.
+   * @returns Extraction output and persisted identifiers.
+   */
   @Post('extract')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Enviar PDF e processar extração da fatura' })

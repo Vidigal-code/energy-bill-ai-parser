@@ -17,9 +17,27 @@ type WriteAuditInput = {
 };
 
 @Injectable()
+/**
+ *
+ * EN: Audit service centralizing persistence of traceability events.
+ *
+ * PT: Servico de auditoria que centraliza persistencia de eventos de rastreabilidade.
+ *
+ * @params Audit payload containing actor, action and execution context.
+ * @returns Void promise after successful persistence.
+ */
 export class AuditService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   *
+   * EN: Persists audit trail events with optional metadata and transport context.
+   *
+   * PT: Persiste eventos de trilha de auditoria com metadados e contexto de transporte opcionais.
+   *
+   * @params input Audit event payload.
+   * @returns Promise resolved after persistence operation.
+   */
   async write(input: WriteAuditInput): Promise<void> {
     ApiLogger.info({
       context: 'AuditService',

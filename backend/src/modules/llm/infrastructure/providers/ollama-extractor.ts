@@ -14,6 +14,7 @@ import {
   ExtractInvoiceInput,
   ILlmExtractor,
 } from '../../llm-extractor.interface';
+import { convertPdfToImageBase64 } from '../../application/pdf-to-image';
 
 type OllamaExtractorConfig = {
   baseUrl: string;
@@ -24,7 +25,7 @@ type OllamaExtractorConfig = {
 };
 
 export class OllamaExtractor implements ILlmExtractor {
-  constructor(private readonly config: OllamaExtractorConfig) {}
+  constructor(private readonly config: OllamaExtractorConfig) { }
 
   async extractInvoiceData(
     input: ExtractInvoiceInput,
@@ -37,9 +38,10 @@ export class OllamaExtractor implements ILlmExtractor {
     const userPrompt = buildExtractionContext({
       extractionContext: this.config.extractionContext,
       fileName: input.fileName,
-      includeBase64Data: true,
-      pdfBase64: input.pdfBuffer.toString('base64'),
+      includeBase64Data: false,
     });
+
+    const base64Image = await convertPdfToImageBase64(input.pdfBuffer);
 
     const response = await fetch(`${this.config.baseUrl}/api/chat`, {
       method: 'POST',
@@ -52,7 +54,7 @@ export class OllamaExtractor implements ILlmExtractor {
         format: 'json',
         messages: [
           { role: 'system', content: prompt },
-          { role: 'user', content: userPrompt },
+          { role: 'user', content: userPrompt, images: [base64Image] },
         ],
       }),
     });

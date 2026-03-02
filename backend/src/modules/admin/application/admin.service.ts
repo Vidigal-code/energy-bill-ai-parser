@@ -22,6 +22,15 @@ type ListQuery = {
 };
 
 @Injectable()
+/**
+ *
+ * EN: Administrative application service for enterprise governance operations.
+ *
+ * PT: Servico de aplicacao administrativo para operacoes de governanca enterprise.
+ *
+ * @params Administrative DTOs and filtering query payloads.
+ * @returns Aggregated management data and mutation outcomes.
+ */
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
@@ -30,6 +39,15 @@ export class AdminService {
     private readonly fileCryptoService: FileCryptoService,
   ) {}
 
+  /**
+   *
+   * EN: Lists all users for administrative governance.
+   *
+   * PT: Lista todos os usuarios para governanca administrativa.
+   *
+   * @params none
+   * @returns Users collection with role and status.
+   */
   listUsers() {
     ApiLogger.info({
       context: 'AdminService',
@@ -49,6 +67,15 @@ export class AdminService {
     });
   }
 
+  /**
+   *
+   * EN: Creates a user account from admin context.
+   *
+   * PT: Cria uma conta de usuario no contexto administrativo.
+   *
+   * @params input Admin DTO with user base data.
+   * @returns Created user projection.
+   */
   async createUser(input: AdminCreateUserDto) {
     ApiLogger.info({
       context: 'AdminService',
@@ -75,6 +102,16 @@ export class AdminService {
     });
   }
 
+  /**
+   *
+   * EN: Applies administrative changes to a user account.
+   *
+   * PT: Aplica alteracoes administrativas em uma conta de usuario.
+   *
+   * @params userId Target user identifier.
+   * @params input Admin DTO with editable fields.
+   * @returns Updated user projection.
+   */
   async updateUser(userId: string, input: AdminUpdateUserDto) {
     ApiLogger.info({
       context: 'AdminService',
@@ -115,6 +152,15 @@ export class AdminService {
     });
   }
 
+  /**
+   *
+   * EN: Permanently removes a user from system scope.
+   *
+   * PT: Remove permanentemente um usuario do escopo do sistema.
+   *
+   * @params userId Target user identifier.
+   * @returns Standardized deletion message.
+   */
   async deleteUser(userId: string) {
     ApiLogger.warning({
       context: 'AdminService',

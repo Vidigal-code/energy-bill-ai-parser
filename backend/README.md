@@ -7,6 +7,8 @@
 
 Backend NestJS com arquitetura modular para extração de dados de faturas em PDF, autenticação enterprise, RBAC, auditoria e armazenamento criptografado.
 
+Este backend está integrado ao frontend Next.js do repositório via sessão segura com cookies HTTP-only e proxy autenticado.
+
 ## Módulos atuais (`src/modules`)
 
 - `auth`
@@ -56,6 +58,7 @@ Backend NestJS com arquitetura modular para extração de dados de faturas em PD
 3. Criptografia JWE do arquivo.
 4. Upload em storage S3.
 5. Extração via provider LLM configurado.
+   > **Nota sobre I.A Open-Source (Ollama)**: Se configurado para usar o Ollama, o backend converte automaticamente a primeira página do PDF para uma imagem PNG em base64 (usando `pdf2pic` e `ghostscript`) antes de enviar para a API. Isso ocorre pois a API nativa do Ollama (vision) não aceita arquivos `.pdf` de forma nativa como o Gemini ou Claude, requerendo dados de imagem no array `images`. Para cumprir o requisito estrito do desafio de "enviar o próprio arquivo PDF" para o LLM, o Gemini é o provedor configurado como padrão, pois aceita o documento nativamente sem pré-processamento.
 6. Cálculo de métricas de negócio.
 7. Persistência transacional (fatura, métricas, documento).
 8. Registro de auditoria e rollback de arquivo em caso de falha.
@@ -115,6 +118,12 @@ npm run test:integration
 npm run test
 ```
 
+Teste opcional com persistência real no banco (Postgres):
+
+```bash
+RUN_DB_INTEGRATION=true npm run test:integration
+```
+
 ## Swagger (OpenAPI)
 
 - URL padrão: `http://localhost:3000/api/docs`
@@ -138,9 +147,7 @@ Endpoints úteis:
 
 - `npm run lint`
 - `npm run test`
-- `npm run build`
 - `docker compose up --build`
-- `docker compose --profile test up --build backend-tests`
 
 ## Roteiro de validação prática da extração
 
@@ -162,6 +169,19 @@ Endpoints úteis:
    - fatura e métricas no banco;
    - documento criptografado no storage;
    - trilha de auditoria com ator, status e meta.
+
+### Evidência de referência (fatura exemplo JAN/2024)
+
+- `numeroCliente`: `7204076116`
+- `mesReferencia`: `JAN/2024`
+- `energiaEletrica`: `50 kWh` / `R$ 47,75`
+- `energiaSceeSemIcms`: `456 kWh` / `R$ 232,42`
+- `energiaCompensadaGdi`: `456 kWh` / `R$ -222,22`
+- `contribIlumPublicaMunicipal`: `R$ 49,43`
+- `consumoEnergiaEletricaKwh`: `506`
+- `energiaCompensadaKwh`: `456`
+- `valorTotalSemGdRs`: `329,60`
+- `economiaGdRs`: `-222,22`
 
 </details>
 
@@ -272,6 +292,12 @@ npm run build
 npm run start:dev
 ```
 
+Optional real-database integration check (Postgres):
+
+```bash
+RUN_DB_INTEGRATION=true npm run test:integration
+```
+
 Useful endpoints:
 
 - `GET /api/health`
@@ -294,23 +320,17 @@ docker compose up --build
 
 Orchestration flow:
 
-- `postgres`, `localstack`, and `ollama` start first;
-- `ollama-init` automatically pulls the model defined in `OLLAMA_MODEL`;
-- `backend` starts only after model pull and runs `prisma db push` on startup.
+- `postgres` and `localstack` start first;
+- `backend` starts and runs `prisma db push` on startup.
+- `frontend` (Next.js) pode subir no mesmo `docker compose` consumindo a API internamente por hostname de serviço.
 
-## Docker (tests)
-
-```bash
-docker compose --profile test up --build backend-tests
-```
+> **Ollama**: Os serviços locais do Ollama (`ollama` e `ollama-init`) vêm **comentados por padrão** no `docker-compose.yml` para economizar recursos da máquina, já que a aplicação está configurada para usar a API ultra rápida e com suporte nativo a PDF do **Gemini** para o desafio. Se desejar rodar a IA 100% local, basta descomentar esses blocos no docker-compose e ajustar o `.env` (`OPEN_SOURCE_IA=true`).
 
 ## Technical Acceptance Checklist
 
 - `npm run lint`
 - `npm run test`
-- `npm run build`
 - `docker compose up --build`
-- `docker compose --profile test up --build backend-tests`
 
 ## Practical Extraction Validation Script
 

@@ -1,24 +1,26 @@
 # Energy Bill AI Parser
 
-Backend enterprise-oriented para processamento de faturas de energia com IA, autenticação segura, RBAC, auditoria e armazenamento criptografado.
+Plataforma full-stack para processamento de faturas de energia com IA, autenticação segura, RBAC, auditoria e armazenamento criptografado.
 
 <details>
 <summary><strong>🇧🇷 Descrição em Português</strong></summary>
 
 ## Objetivo atual
 
-O foco atual do repositório é o backend em NestJS para:
+O repositório entrega backend + frontend para:
 
 - upload de PDF;
 - extração estruturada com múltiplos provedores de IA;
 - cálculo de métricas de negócio;
 - persistência com Prisma/PostgreSQL;
 - controle de acesso com JWT + RBAC (`ADMIN` e `USER`);
-- trilha de auditoria e gestão administrativa completa.
+- trilha de auditoria e gestão administrativa completa;
+- experiência web em Next.js integrada ao backend.
 
 ## Stack
 
 - Node.js, NestJS, TypeScript
+- Next.js, React, Redux Toolkit, React Query, Axios, Tailwind CSS
 - Prisma ORM, PostgreSQL
 - LLMs: Ollama, OpenAI, Gemini/Google, Claude/Anthropic
 - AWS S3 (LocalStack no ambiente local)
@@ -33,6 +35,7 @@ O foco atual do repositório é o backend em NestJS para:
 - `backend/src/modules/storage`: criptografia JWE e armazenamento S3.
 - `backend/src/modules/audit`: persistência de logs de auditoria.
 - `backend/src/shared`: config/env, logger, resposta HTTP padrão, filtros e mensagens centralizadas.
+- `frontend/src`: arquitetura FSD (`app`, `shared`, `entities`, `features`, `widgets`) com sessão HTTP-only cookie via rotas internas.
 
 ## Extração configurável
 
@@ -46,6 +49,15 @@ Configuração principal via variáveis de ambiente:
 - `INVOICE_EXTRACTION_PROMPT`
 - `INVOICE_EXTRACTION_CONTEXT`
 
+## Decisões Arquiteturais e Tecnologias
+
+- **Framework Backend (NestJS)**: Escolhido pela arquitetura modular, injeção de dependências e suporte nativo ao TypeScript, garantindo escalabilidade e testabilidade.
+- **ORM (Prisma)**: Facilita a modelagem relacional dos dados estruturados extraídos, com tipagem fortemente vinculada ao banco PostgreSQL.
+- **LLM Escolhido (Gemini)**: Conforme o requisito estrito do desafio, era obrigatório o envio direto do **próprio arquivo PDF** para análise visão/documento do LLM (sem usar bibliotecas de extração de texto estruturado). Modelos Open-Source como `llama3.2-vision` (Ollama) não suportam o recebimento de PDFs de forma nativa através da API (aceitando apenas imagens binárias individuais no array de `images`). 
+  
+  Por esse motivo, **Gemini foi eleito como padrão** na aplicação e no Docker, pois sua API aceita o mimeType `application/pdf` diretamente na camada multimodal, aderindo 100% aos requisitos de não manipular o documento antes do envio.
+- **Suporte Open-Source (Ollama)**: O projeto **DÁ SUPORTE COMPLETO** a IA Local e Open-Source. Caso deseje utilizar o Ollama, altere no `.env` a flag `OPEN_SOURCE_IA=true` e `LLM_PROVIDER=ollama`. Ao detectar esse provider configurado, o adaptador interno `OllamaExtractor` fará automaticamente o fallback convertendo a primeira página do PDF para uma imagem (usando `pdf2pic` / `ghostscript` incluídos no Docker) para viabilizar o envio visual ao LLM local, mantendo a não dependência de extração de *textos*, focando estritamente em imagem/visão.
+
 ## Segurança e padrões
 
 - Rotas protegidas por autenticação global (exceto rotas públicas de auth/health).
@@ -58,8 +70,9 @@ Configuração principal via variáveis de ambiente:
 
 ## Ambiente
 
-Use somente arquivos de ambiente na raiz:
+Para rodar, utilize as variáveis abaixo. Note que para rodar 100% com análise visão de PDF, insira sua chave do Gemini.
 
+- `GEMINI_API_KEY=sua_chave_aqui`
 - `/.env`
 - `/.env.example`
 
@@ -71,28 +84,25 @@ Na raiz do projeto:
 docker compose up --build
 ```
 
-Para executar a suíte de testes em container:
-
-```bash
-docker compose --profile test up --build backend-tests
-```
-
 Serviços principais:
 
+- Frontend: `http://localhost:3001`
 - API: `http://localhost:3000`
 - Swagger: `http://localhost:3000/api/docs`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
-- Ollama: `http://localhost:11434`
 - LocalStack (S3): `http://localhost:4566`
+
+> **Ollama**: Os serviços locais do Ollama (`ollama` e `ollama-init`) vêm **comentados por padrão** no `docker-compose.yml` para economizar recursos da máquina, já que a aplicação está configurada para usar a API ultra rápida e com suporte nativo a PDF do **Gemini** para o desafio. Se desejar rodar a IA 100% local, basta descomentar esses blocos no docker-compose e ajustar o `.env` (`OPEN_SOURCE_IA=true`).
 
 ## Checklist de validação (escopo backend)
 
 - `npm run lint` em `backend`;
 - `npm run test` em `backend` (unitário + integração);
 - `npm run build` em `backend`;
-- `docker compose up --build` para infraestrutura + API;
-- `docker compose --profile test up --build backend-tests` para testes em container.
+- `npm run lint` em `frontend`;
+- `npm run build` em `frontend`;
+- `docker compose up --build` para infraestrutura + API + testes em container.
 
 ## Roteiro de validação prática (fatura)
 
@@ -112,6 +122,19 @@ E validar métricas calculadas:
 - `valorTotalSemGdRs`;
 - `economiaGdRs`.
 
+Evidência de referência (fatura exemplo JAN/2024):
+
+- `numeroCliente`: `7204076116`
+- `mesReferencia`: `JAN/2024`
+- `energiaEletrica`: `50 kWh` / `R$ 47,75`
+- `energiaSceeSemIcms`: `456 kWh` / `R$ 232,42`
+- `energiaCompensadaGdi`: `456 kWh` / `R$ -222,22`
+- `contribIlumPublicaMunicipal`: `R$ 49,43`
+- `consumoEnergiaEletricaKwh`: `506`
+- `energiaCompensadaKwh`: `456`
+- `valorTotalSemGdRs`: `329,60`
+- `economiaGdRs`: `-222,22`
+
 </details>
 
 <details>
@@ -119,18 +142,20 @@ E validar métricas calculadas:
 
 ## Current Goal
 
-The current repository focus is the NestJS backend to provide:
+The repository currently delivers backend + frontend to provide:
 
 - PDF upload;
 - structured extraction with multiple AI providers;
 - business metrics computation;
 - Prisma/PostgreSQL persistence;
 - secure auth and RBAC (`ADMIN` and `USER`);
-- audit trail and full admin management.
+- audit trail and full admin management;
+- full web experience in Next.js integrated to backend services.
 
 ## Stack
 
 - Node.js, NestJS, TypeScript
+- Next.js, React, Redux Toolkit, React Query, Axios, Tailwind CSS
 - Prisma ORM, PostgreSQL
 - LLMs: Ollama, OpenAI, Gemini/Google, Claude/Anthropic
 - AWS S3 (LocalStack for local development)
@@ -145,6 +170,7 @@ The current repository focus is the NestJS backend to provide:
 - `backend/src/modules/storage`: JWE file encryption and S3 persistence.
 - `backend/src/modules/audit`: audit log persistence.
 - `backend/src/shared`: env/config, logger, HTTP response contract, filters, centralized messages.
+- `frontend/src`: FSD architecture (`app`, `shared`, `entities`, `features`, `widgets`) with HTTP-only cookie session using Next route handlers.
 
 ## Configurable Extraction
 
@@ -183,28 +209,25 @@ From repository root:
 docker compose up --build
 ```
 
-To run the test suite in containers:
-
-```bash
-docker compose --profile test up --build backend-tests
-```
-
 Main services:
 
+- Frontend: `http://localhost:3001`
 - API: `http://localhost:3000`
 - Swagger: `http://localhost:3000/api/docs`
 - Health: `http://localhost:3000/api/health`
 - PostgreSQL: `localhost:5432`
-- Ollama: `http://localhost:11434`
 - LocalStack (S3): `http://localhost:4566`
+
+> **Ollama**: Local Ollama services (`ollama` and `ollama-init`) are **commented out by default** in `docker-compose.yml` to save machine resources, since the application is configured to use the ultra-fast **Gemini** API (native PDF support) for the challenge. If you wish to run a 100% local AI, simply uncomment these blocks in `docker-compose.yml` and adjust the `.env` file (`OPEN_SOURCE_IA=true`).
 
 ## Validation Checklist (backend scope)
 
 - `npm run lint` in `backend`;
 - `npm run test` in `backend` (unit + integration);
 - `npm run build` in `backend`;
-- `docker compose up --build` for infrastructure + API;
-- `docker compose --profile test up --build backend-tests` for containerized tests.
+- `npm run lint` in `frontend`;
+- `npm run build` in `frontend`;
+- `docker compose up --build` for infrastructure + API + containerized tests.
 
 ## Practical Invoice Validation Script
 
@@ -223,5 +246,18 @@ Then validate computed metrics:
 - `energiaCompensadaKwh`;
 - `valorTotalSemGdRs`;
 - `economiaGdRs`.
+
+Reference evidence (sample invoice JAN/2024):
+
+- `numeroCliente`: `7204076116`
+- `mesReferencia`: `JAN/2024`
+- `energiaEletrica`: `50 kWh` / `R$ 47,75`
+- `energiaSceeSemIcms`: `456 kWh` / `R$ 232,42`
+- `energiaCompensadaGdi`: `456 kWh` / `R$ -222,22`
+- `contribIlumPublicaMunicipal`: `R$ 49,43`
+- `consumoEnergiaEletricaKwh`: `506`
+- `energiaCompensadaKwh`: `456`
+- `valorTotalSemGdRs`: `329,60`
+- `economiaGdRs`: `-222,22`
 
 </details>

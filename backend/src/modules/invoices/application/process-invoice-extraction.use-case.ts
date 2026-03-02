@@ -35,6 +35,15 @@ type ProcessInvoiceExtractionInput = {
 };
 
 @Injectable()
+/**
+ *
+ * EN: Core invoice processing use-case orchestrating extraction, storage, persistence and auditing.
+ *
+ * PT: Caso de uso principal de processamento de fatura, orquestrando extracao, armazenamento, persistencia e auditoria.
+ *
+ * @params Extraction input with file payload and actor context.
+ * @returns Persisted invoice response with computed metrics.
+ */
 export class ProcessInvoiceExtractionUseCase {
   constructor(
     @Inject(LLM_EXTRACTOR_TOKEN)
@@ -45,8 +54,17 @@ export class ProcessInvoiceExtractionUseCase {
     private readonly documentStorage: DocumentStoragePort,
     private readonly fileCryptoService: FileCryptoService,
     private readonly auditService: AuditService,
-  ) {}
+  ) { }
 
+  /**
+   *
+   * EN: Processes a PDF invoice, extracts data with LLM, persists transactionally and writes audit.
+   *
+   * PT: Processa uma fatura PDF, extrai dados com LLM, persiste em transacao e registra auditoria.
+   *
+   * @params input Request data with actor, file metadata and binary payload.
+   * @returns Persisted identifiers, raw extraction payload and computed metrics.
+   */
   async execute(input: ProcessInvoiceExtractionInput) {
     const maxFileSizeRaw = this.configService.get<string | number>(
       'PDF_MAX_FILE_SIZE_MB',
@@ -113,22 +131,22 @@ export class ProcessInvoiceExtractionUseCase {
             uploaderUserId: input.actorUserId,
             fileName: input.fileName,
             status: InvoiceStatus.SUCCESS,
-            numeroCliente: extraction.numeroCliente,
-            mesReferencia: extraction.mesReferencia,
+            numeroCliente: extraction['Nº DO CLIENTE'],
+            mesReferencia: extraction['Mês de referência'],
             energiaEletricaQuantidadeKwh:
-              extraction.itensFatura.energiaEletrica.quantidadeKwh,
+              extraction['Energia Elétrica']['Quantidade (kWh)'],
             energiaEletricaValorRs:
-              extraction.itensFatura.energiaEletrica.valorRs,
+              extraction['Energia Elétrica']['Valor (R$)'],
             energiaSceeSemIcmsQuantidadeKwh:
-              extraction.itensFatura.energiaSceeSemIcms.quantidadeKwh,
+              extraction['Energia SCEEE s/ICMS']['Quantidade (kWh)'],
             energiaSceeSemIcmsValorRs:
-              extraction.itensFatura.energiaSceeSemIcms.valorRs,
+              extraction['Energia SCEEE s/ICMS']['Valor (R$)'],
             energiaCompensadaGdiQuantidadeKwh:
-              extraction.itensFatura.energiaCompensadaGdi.quantidadeKwh,
+              extraction['Energia compensada GD I']['Quantidade (kWh)'],
             energiaCompensadaGdiValorRs:
-              extraction.itensFatura.energiaCompensadaGdi.valorRs,
+              extraction['Energia compensada GD I']['Valor (R$)'],
             contribIlumPublicaMunicipalValorRs:
-              extraction.itensFatura.contribIlumPublicaMunicipal.valorRs,
+              extraction['Contrib Ilum Publica Municipal']['Valor (R$)'],
             extractionProvider: provider,
             rawExtractionJson: extraction,
           },
@@ -216,6 +234,15 @@ export class ProcessInvoiceExtractionUseCase {
     }
   }
 
+  /**
+   *
+   * EN: Resolves extraction provider based on environment strategy.
+   *
+   * PT: Resolve o provider de extracao com base na estrategia de ambiente.
+   *
+   * @params none
+   * @returns Provider key used to identify extraction origin.
+   */
   private resolveProvider() {
     const openSourceIa =
       this.configService.get<string>('OPEN_SOURCE_IA')?.toLowerCase() ===

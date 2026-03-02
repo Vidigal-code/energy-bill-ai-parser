@@ -19,14 +19,12 @@ describe('Invoices extract (integration)', () => {
   let app: INestApplication;
 
   const extraction = {
-    numeroCliente: '7204076116',
-    mesReferencia: 'JAN/2024',
-    itensFatura: {
-      energiaEletrica: { quantidadeKwh: 50, valorRs: 47.75 },
-      energiaSceeSemIcms: { quantidadeKwh: 456, valorRs: 232.42 },
-      energiaCompensadaGdi: { quantidadeKwh: 456, valorRs: -222.22 },
-      contribIlumPublicaMunicipal: { valorRs: 49.43 },
-    },
+    'Nº DO CLIENTE': '7204076116',
+    'Mês de referência': 'JAN/2024',
+    'Energia Elétrica': { 'Quantidade (kWh)': 50, 'Valor (R$)': 47.75 },
+    'Energia SCEEE s/ICMS': { 'Quantidade (kWh)': 456, 'Valor (R$)': 232.42 },
+    'Energia compensada GD I': { 'Quantidade (kWh)': 456, 'Valor (R$)': -222.22 },
+    'Contrib Ilum Publica Municipal': { 'Valor (R$)': 49.43 },
   };
 
   const mockUser: AuthUser = {
@@ -70,6 +68,11 @@ describe('Invoices extract (integration)', () => {
   const auditMock = {
     write: jest.fn().mockResolvedValue(undefined),
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    llmMock.extractInvoiceData.mockResolvedValue(extraction);
+  });
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -166,5 +169,24 @@ describe('Invoices extract (integration)', () => {
       });
 
     expect(response.status).toBe(413);
+  });
+
+  it('deve registrar erro e remover arquivo quando LLM falhar', async () => {
+    llmMock.extractInvoiceData.mockRejectedValueOnce(
+      new Error('LLM indisponivel'),
+    );
+
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server)
+      .post('/invoices/extract')
+      .attach('file', Buffer.from('%PDF-1.4 fail-test'), {
+        filename: 'fatura-falha.pdf',
+        contentType: 'application/pdf',
+      });
+
+    expect(response.status).toBe(500);
+    expect(storageMock.upload).toHaveBeenCalledTimes(1);
+    expect(storageMock.remove).toHaveBeenCalledTimes(1);
+    expect(auditMock.write).toHaveBeenCalledTimes(1);
   });
 });

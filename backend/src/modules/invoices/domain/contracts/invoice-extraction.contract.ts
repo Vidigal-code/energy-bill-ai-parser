@@ -3,24 +3,22 @@ import { z } from 'zod';
 const numericField = z.number().finite();
 
 export const invoiceExtractionSchema = z.object({
-  numeroCliente: z.string().min(1),
-  mesReferencia: z.string().min(1),
-  itensFatura: z.object({
-    energiaEletrica: z.object({
-      quantidadeKwh: numericField,
-      valorRs: numericField,
-    }),
-    energiaSceeSemIcms: z.object({
-      quantidadeKwh: numericField,
-      valorRs: numericField,
-    }),
-    energiaCompensadaGdi: z.object({
-      quantidadeKwh: numericField,
-      valorRs: numericField,
-    }),
-    contribIlumPublicaMunicipal: z.object({
-      valorRs: numericField,
-    }),
+  'Nº DO CLIENTE': z.string().min(1),
+  'Mês de referência': z.string().min(1),
+  'Energia Elétrica': z.object({
+    'Quantidade (kWh)': numericField,
+    'Valor (R$)': numericField,
+  }),
+  'Energia SCEEE s/ICMS': z.object({
+    'Quantidade (kWh)': numericField,
+    'Valor (R$)': numericField,
+  }),
+  'Energia compensada GD I': z.object({
+    'Quantidade (kWh)': numericField,
+    'Valor (R$)': numericField,
+  }),
+  'Contrib Ilum Publica Municipal': z.object({
+    'Valor (R$)': numericField,
   }),
 });
 
@@ -48,46 +46,42 @@ export type InvoiceExtractionReference = z.infer<
 >;
 
 export const DEFAULT_INVOICE_EXTRACTION_REFERENCE: InvoiceExtractionReference =
-  {
-    requiredFields: [
-      'numeroCliente',
-      'mesReferencia',
-      'itensFatura.energiaEletrica.quantidadeKwh',
-      'itensFatura.energiaEletrica.valorRs',
-      'itensFatura.energiaSceeSemIcms.quantidadeKwh',
-      'itensFatura.energiaSceeSemIcms.valorRs',
-      'itensFatura.energiaCompensadaGdi.quantidadeKwh',
-      'itensFatura.energiaCompensadaGdi.valorRs',
-      'itensFatura.contribIlumPublicaMunicipal.valorRs',
-    ],
-    businessRules: {
-      consumoEnergiaEletricaKwh:
-        'energiaEletrica.quantidadeKwh + energiaSceeSemIcms.quantidadeKwh',
-      energiaCompensadaKwh: 'energiaCompensadaGdi.quantidadeKwh',
-      valorTotalSemGdRs:
-        'energiaEletrica.valorRs + energiaSceeSemIcms.valorRs + contribIlumPublicaMunicipal.valorRs',
-      economiaGdRs: 'energiaCompensadaGdi.valorRs',
-    },
-  };
+{
+  requiredFields: [
+    '"Nº DO CLIENTE" (Ex: 7202210726)',
+    '"Mês de referência" (Ex: SET/2024)',
+    "'Energia Elétrica' - Quantidade (kWh) e Valor (R$)",
+    "'Energia SCEEE s/ICMS' - Quantidade (kWh) e Valor (R$)",
+    "'Energia compensada GD I' - Quantidade (kWh) e Valor (R$)",
+    "'Contrib Ilum Publica Municipal' - Valor (R$)"
+  ],
+  businessRules: {
+    consumoEnergiaEletricaKwh:
+      "'Energia Elétrica' Quantidade (kWh) + 'Energia SCEEE s/ICMS' Quantidade (kWh)",
+    energiaCompensadaKwh: "'Energia compensada GD I' Quantidade (kWh)",
+    valorTotalSemGdRs:
+      "'Energia Elétrica' Valor (R$) + 'Energia SCEEE s/ICMS' Valor (R$) + 'Contrib Ilum Publica Municipal' Valor (R$)",
+    economiaGdRs: "'Energia compensada GD I' Valor (R$)",
+  },
+};
 
 export const DEFAULT_INVOICE_EXTRACTION_PROMPT = `
-Você é um extrator de dados de fatura de energia. Retorne apenas JSON válido.
-Não invente valores. Se um campo não existir no documento, retorne 0 para campos numéricos e string vazia para texto.
+Você é um extrator de dados de fatura de energia elétrica. Seu objetivo é realizar a análise multimodal do documento PDF fornecido e extrair os dados estruturados.
+Retorne um objeto JSON estrito (JSON Mode/Structured Output) contendo EXATAMENTE as informações abaixo (respeite as chaves textualmente):
 
-Campos obrigatórios:
-- numeroCliente
-- mesReferencia (ex.: SET/2024)
-- itensFatura.energiaEletrica.quantidadeKwh
-- itensFatura.energiaEletrica.valorRs
-- itensFatura.energiaSceeSemIcms.quantidadeKwh
-- itensFatura.energiaSceeSemIcms.valorRs
-- itensFatura.energiaCompensadaGdi.quantidadeKwh
-- itensFatura.energiaCompensadaGdi.valorRs
-- itensFatura.contribIlumPublicaMunicipal.valorRs
+- "Nº DO CLIENTE"
+- "Mês de referência"
+- "Energia Elétrica": com os campos "Quantidade (kWh)" e "Valor (R$)"
+- "Energia SCEEE s/ICMS": com os campos "Quantidade (kWh)" e "Valor (R$)"
+- "Energia compensada GD I": com os campos "Quantidade (kWh)" e "Valor (R$)"
+- "Contrib Ilum Publica Municipal": com o campo "Valor (R$)"
+
+Não invente valores. Se um campo não existir no documento, retorne 0 para campos numéricos e string vazia para texto.
+O JSON retornado deve ter esta exata estrutura e nomenclaturas.
 `.trim();
 
 export const DEFAULT_INVOICE_EXTRACTION_CONTEXT =
-  'Analise o arquivo "{{fileName}}" e retorne somente JSON válido com os campos definidos em INVOICE_EXTRACTION_REFERENCE.';
+  'Analise o arquivo PDF "{{fileName}}" anexado e retorne SOMENTE um JSON válido.';
 
 export function resolveInvoiceExtractionReference(
   rawReference?: string,
@@ -126,18 +120,18 @@ export function computeInvoiceMetrics(
   extraction: InvoiceExtraction,
 ): InvoiceComputedMetrics {
   const consumoEnergiaEletricaKwh =
-    extraction.itensFatura.energiaEletrica.quantidadeKwh +
-    extraction.itensFatura.energiaSceeSemIcms.quantidadeKwh;
+    extraction['Energia Elétrica']['Quantidade (kWh)'] +
+    extraction['Energia SCEEE s/ICMS']['Quantidade (kWh)'];
 
   const energiaCompensadaKwh =
-    extraction.itensFatura.energiaCompensadaGdi.quantidadeKwh;
+    extraction['Energia compensada GD I']['Quantidade (kWh)'];
 
   const valorTotalSemGdRs =
-    extraction.itensFatura.energiaEletrica.valorRs +
-    extraction.itensFatura.energiaSceeSemIcms.valorRs +
-    extraction.itensFatura.contribIlumPublicaMunicipal.valorRs;
+    extraction['Energia Elétrica']['Valor (R$)'] +
+    extraction['Energia SCEEE s/ICMS']['Valor (R$)'] +
+    extraction['Contrib Ilum Publica Municipal']['Valor (R$)'];
 
-  const economiaGdRs = extraction.itensFatura.energiaCompensadaGdi.valorRs;
+  const economiaGdRs = extraction['Energia compensada GD I']['Valor (R$)'];
 
   return {
     consumoEnergiaEletricaKwh,
