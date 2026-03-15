@@ -1,36 +1,66 @@
 # Arquitectura
 
-El proyecto esta organizado por fronteras de feature y responsabilidades de runtime.
+El repositorio sigue un split tipo monorepo con aplicaciones separadas `backend` y `frontend`.
 
-## Modulos principales
+## Mapa del repositorio
 
-- `src/app/[[...repo]]/page.tsx`
-  - parser de rutas
-  - generateStaticParams
-  - seleccion de shell (docs vs repository search)
-- `src/entities/docs/api/load-docs-data.ts`
-  - carga de config local/remota
-  - resolucion de version
-  - pipeline fetch + parse markdown
-  - carga de layouts + temas
-- `src/widgets/docs-shell/docs-shell.tsx`
-  - render de UI
-  - estado de idioma/version/tema
-  - sincronizacion de URL
+- `backend/`: API NestJS con modulos por dominio
+- `frontend/`: UI Next.js App Router con estructura inspirada en FSD
+- `docker-compose.yml`: orquestacion de aplicacion + infraestructura
+- `envexample.txt`: template oficial de variables
 
-## Flujo de datos
+## Fronteras de modulo en backend
 
-1. Llega la ruta (`/owner/repo/v/x.y.z` o equivalente local)
-2. Se resuelve config (local o remoto)
-3. Config de version sobreescribe rutas/menus base
-4. Markdown se carga y convierte a HTML
-5. Template de layout se resuelve y aplica en CSS vars
-6. Shell renderiza contenido y controles
+- `auth`: ciclo de sesion, refresh, perfil, guards
+- `invoices`: carga + extraccion + dashboards
+- `admin`: gobernanza de usuarios/facturas/documentos/auditoria
+- `llm`: abstraccion de providers y parser de salida
+- `storage`: cifrado JWE + adapter S3
+- `audit`: registro de acciones sensibles
+- `health`: endpoint de liveness
 
-## Puntos de resiliencia
+Capa compartida (cross-cutting):
 
-- fallback de carga para layouts/templates
-- carga de markdown por idioma con fallback de error
-- sincronizacion de idioma/version/tema via localStorage
+- `shared/config`: schema y parse de env
+- `shared/http`: contrato de respuesta, interceptors y filtro global
+- `shared/prisma`: service/module de Prisma
+- `shared/logging`: logger estructurado
 
-> Version (ES): 1.0.0
+## Ciclo de solicitud (API)
+
+1. La solicitud entra por el prefijo global `/api`
+2. Guards globales aplican JWT + roles (excepto `@Public`)
+3. ValidationPipe valida y sanea payload
+4. Service/use-case ejecuta logica de negocio
+5. Interceptor de exito estandariza la respuesta
+6. Excepciones se normalizan por el filtro global
+
+## Flujo de extraccion de factura
+
+1. Usuario sube PDF en `POST /api/invoices/extract`
+2. Se valida tipo/tamano (`PDF_MAX_FILE_SIZE_MB`)
+3. Archivo se cifra con JWE
+4. Contenido cifrado se guarda en storage S3
+5. Provider IA configurado extrae campos
+6. Se calculan metricas de negocio
+7. Se persiste factura + metricas + metadatos del documento
+8. Se guarda auditoria; puede ejecutarse rollback en fallo
+
+## Arquitectura frontend
+
+- Paginas: `login`, `register`, `dashboard`, `invoices`, `profile`, `admin`
+- API routes:
+  - `api/auth/*` para operaciones de sesion
+  - `api/proxy/[...path]` para proxy autenticado
+- Estrategia de sesion:
+  - cookies HTTP-only para access/refresh tokens
+  - refresh transparente en `401`
+
+## Puntos clave del modelo de datos
+
+- `User` con rol y estado activo
+- `RefreshToken` para control de rotacion
+- `Invoice` con campos extraidos y estado
+- `InvoiceMetrics` con KPIs calculados
+- `StoredDocument` con object key/checksum
+- `AuditLog` con actor, accion, estado y contexto
