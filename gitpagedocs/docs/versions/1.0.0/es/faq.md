@@ -1,31 +1,52 @@
 # FAQ
 
-## Por que repositorios remotos no abren en local?
+## Por que login funciona pero endpoints protegidos devuelven 401?
 
 Verifica:
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true` en `.env`
-- repositorio objetivo contiene `gitpagedocs/config.json`
-- paths markdown del repositorio coinciden con su config de rutas
+- llamadas frontend pasando por `api/proxy/[...path]`
+- cookies de auth presentes y no bloqueadas por navegador
+- refresh token valido y no revocado
+- backend y frontend usando URLs base compatibles
 
-## Por que una ruta de version muestra contenido incorrecto?
-
-Verifica:
-
-- `VersionControl.versions[*].path` en `gitpagedocs/config.json`
-- config de version tiene `routes` y `menus-header` validos
-- markdown existe para cada idioma
-
-## Por que tema no se aplica correctamente?
+## Por que falla la extraccion de factura?
 
 Verifica:
 
-- `layoutsConfig.json` referencia templates validos
-- ids de template son unicos
-- tema seleccionado existe en el mapa de temas cargados
+- valor de `LLM_PROVIDER` y API key correspondiente
+- archivo subido es PDF valido y menor a `PDF_MAX_FILE_SIZE_MB`
+- modelo configurado existe (`GEMINI_MODEL`, `OPENAI_MODEL`, etc.)
+- logs backend para errores de parse del provider
 
-## Por que GitHub Pages puede comportarse distinto a local?
+## Por que documentos se guardan pero no se descargan?
 
-Porque el build de GitHub Pages habilita la pagina inicial de busqueda y comportamiento especifico de exportacion.
+Verifica:
 
-> Version (ES): 1.0.0
+- `STORAGE_DRIVER` y configuracion `S3_*`
+- bucket existente (`S3_BUCKET`)
+- `JWE_SECRET` estable entre reinicios
+- objeto no eliminado por rutina de rollback
+
+## Por que la aplicacion inicia pero fallan operaciones de DB?
+
+Verifica:
+
+- conectividad de `DATABASE_URL` desde backend
+- ejecucion correcta de `npx prisma db push`
+- healthcheck de postgres en estado OK
+- schema y credenciales alineados al entorno
+
+## Por que datos admin aparecen vacios?
+
+Verifica:
+
+- cuenta autenticada tiene rol `ADMIN`
+- variables de bootstrap admin configuradas
+- filtros (`fromDate`, `toDate`, `username`, paginacion) no estan demasiado restrictivos
+
+## Como ejecuto IA 100% local open-source?
+
+1. Define `OPEN_SOURCE_IA=true`
+2. Define `LLM_PROVIDER=ollama`
+3. Descomenta `ollama` y `ollama-init` en `docker-compose.yml`
+4. Asegura pull/init del modelo antes de probar extraccion

@@ -97,26 +97,8 @@
       {
         "id": "1.0.0",
         "path": "gitpagedocs/docs/versions/1.0.0/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
+        "ProjectLink": "https://github.com/Vidigal-code/energy-bill-ai-parser",
         "PathConfig": "gitpagedocs/docs/versions/1.0.0/config.json",
-        "branch": "",
-        "release": "",
-        "commit": ""
-      },
-      {
-        "id": "1.1.0",
-        "path": "gitpagedocs/docs/versions/1.1.0/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
-        "PathConfig": "gitpagedocs/docs/versions/1.1.0/config.json",
-        "branch": "",
-        "release": "",
-        "commit": ""
-      },
-      {
-        "id": "1.1.1",
-        "path": "gitpagedocs/docs/versions/1.1.1/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
-        "PathConfig": "gitpagedocs/docs/versions/1.1.1/config.json",
         "branch": "",
         "release": "",
         "commit": ""

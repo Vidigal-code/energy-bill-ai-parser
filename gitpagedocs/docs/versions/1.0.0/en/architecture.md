@@ -1,36 +1,66 @@
 # Architecture
 
-This project is organized by feature boundaries and UI runtime responsibilities.
+The repository follows a monorepo-style split with independent `backend` and `frontend` applications.
 
-## Main runtime modules
+## Repository map
 
-- `src/app/[[...repo]]/page.tsx`
-  - route parser
-  - static params generation
-  - shell selection (docs shell vs repository search shell)
-- `src/entities/docs/api/load-docs-data.ts`
-  - local/remote config loading
-  - version resolution
-  - markdown fetch + parse pipeline
-  - layouts + themes loading
-- `src/widgets/docs-shell/docs-shell.tsx`
-  - UI rendering
-  - language/version/theme state
-  - URL synchronization
+- `backend/`: NestJS API with modular domain boundaries
+- `frontend/`: Next.js App Router UI with FSD-inspired structure
+- `docker-compose.yml`: orchestration for app + infrastructure
+- `envexample.txt`: canonical environment template
 
-## Data flow
+## Backend module boundaries
 
-1. Request route arrives (`/owner/repo/v/x.y.z` or local equivalent)
-2. Config is resolved (local or remote repo)
-3. Version config overrides base routes/menus
-4. Markdown is loaded and converted to HTML
-5. Layout template is resolved and CSS vars applied
-6. Shell renders content + controls
+- `auth`: session lifecycle, refresh rotation, profile, guards
+- `invoices`: upload + extraction workflow + dashboards
+- `admin`: privileged management for users/invoices/documents/audit
+- `llm`: provider abstraction and output parsing
+- `storage`: JWE encryption + S3 adapter
+- `audit`: action logging for sensitive operations
+- `health`: liveness endpoint
 
-## Reliability points
+Cross-cutting shared layer:
 
-- fallback strategy for layout/template loading
-- resilient markdown loading per language
-- localStorage sync for user language/version/theme
+- `shared/config`: env schema and parsing
+- `shared/http`: response contract, interceptors, exception filter
+- `shared/prisma`: Prisma service/module
+- `shared/logging`: structured logger
 
-> Version: 1.0.0
+## Request lifecycle (API)
+
+1. Incoming request goes through global prefix `/api`
+2. Global guards enforce JWT auth + roles (except `@Public`)
+3. Validation pipe sanitizes and validates payloads
+4. Module service/use-case executes domain logic
+5. Success interceptor wraps output in standard response contract
+6. Exceptions are normalized by global filter
+
+## Invoice extraction flow
+
+1. User uploads PDF to `POST /api/invoices/extract`
+2. File type/size is validated (`PDF_MAX_FILE_SIZE_MB`)
+3. File is encrypted with JWE
+4. Encrypted payload is stored in S3-compatible storage
+5. Configured LLM provider extracts structured fields
+6. Business metrics are calculated
+7. Invoice + metrics + document metadata are persisted
+8. Audit record is written; rollback may run on failure
+
+## Frontend architecture
+
+- Pages: `login`, `register`, `dashboard`, `invoices`, `profile`, `admin`
+- API routes:
+  - `api/auth/*` for session operations
+  - `api/proxy/[...path]` for authenticated forwarding
+- Session strategy:
+  - HTTP-only cookies for access/refresh tokens
+  - transparent refresh on `401`
+
+## Data model highlights
+
+- `User` with role and active status
+- `RefreshToken` for token rotation tracking
+- `Invoice` with extracted fields and status
+- `InvoiceMetrics` for computed KPIs
+- `StoredDocument` with object key/checksum metadata
+- `AuditLog` with actor, action, status, and context
