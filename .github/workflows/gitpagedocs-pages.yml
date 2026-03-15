@@ -47,6 +47,7 @@ jobs:
         env:
           GITHUB_ACTIONS: "true"
           GITHUB_REPOSITORY: ${{ github.repository }}
+          GITPAGEDOCS_PAGES_PATH: "git-page-docs"
 
       - name: Force root URL to docs entrypoint
         run: |
@@ -58,7 +59,19 @@ jobs:
           const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
           const defaultVersion = cfg?.site?.docsVersion || cfg?.VersionControl?.versions?.[0]?.id || '1.1.0';
           const defaultLang = cfg?.site?.defaultLanguage || 'en';
-          const redirectTarget = './v/' + defaultVersion + '/?lang=' + defaultLang;
+          const rendering = cfg?.site?.rendering || '';
+          let nestedPathPrefix = '';
+          try {
+            const parsed = new URL(rendering);
+            const parts = parsed.pathname.split('/').filter(Boolean);
+            if (/github\.io$/i.test(parsed.hostname) && parts.length >= 2) {
+              nestedPathPrefix = parts.slice(1).join('/');
+            } else if (parts.length >= 3) {
+              nestedPathPrefix = parts.slice(2).join('/');
+            }
+          } catch {}
+          const prefix = nestedPathPrefix ? './' + nestedPathPrefix.replace(/^/+|/+$/g, '') + '/' : './';
+          const redirectTarget = prefix + 'v/' + defaultVersion + '/?lang=' + defaultLang;
           const html = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=' + redirectTarget + '"/><script>window.location.replace("' + redirectTarget + '" + (window.location.search || ""));</script></head><body>Redirecting...</body></html>';
           fs.writeFileSync(path.join('.gitpagedocs-runtime', 'out', 'index.html'), html);
           NODE
