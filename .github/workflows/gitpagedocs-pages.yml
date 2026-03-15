@@ -36,6 +36,11 @@ jobs:
             rm -rf .gitpagedocs-runtime/gitpagedocs
             cp -R gitpagedocs .gitpagedocs-runtime/gitpagedocs
           fi
+          if [ -f icon.svg ]; then
+            cp icon.svg .gitpagedocs-runtime/public/icon.svg
+          elif [ -f gitpagedocs/icon.svg ]; then
+            cp gitpagedocs/icon.svg .gitpagedocs-runtime/public/icon.svg
+          fi
 
       - name: Install runtime dependencies
         run: npm ci
@@ -53,14 +58,22 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
+          const repository = process.env.GITHUB_REPOSITORY || '';
+          const repositoryName = repository.split('/')[1] || 'git-page-docs';
           const cfgPath = path.join('.gitpagedocs-runtime', 'gitpagedocs', 'config.json');
           if (!fs.existsSync(cfgPath)) process.exit(0);
           const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
           const defaultVersion = cfg?.site?.docsVersion || cfg?.VersionControl?.versions?.[0]?.id || '1.1.0';
           const defaultLang = cfg?.site?.defaultLanguage || 'en';
-          const redirectTarget = './v/' + defaultVersion + '/?lang=' + defaultLang;
-          const html = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=' + redirectTarget + '"/><script>window.location.replace("' + redirectTarget + '" + (window.location.search || ""));</script></head><body>Redirecting...</body></html>';
-          fs.writeFileSync(path.join('.gitpagedocs-runtime', 'out', 'index.html'), html);
+          const redirectTargetRoot = './' + repositoryName + '/v/' + defaultVersion + '/?lang=' + defaultLang;
+          const redirectTargetProject = './v/' + defaultVersion + '/?lang=' + defaultLang;
+          const rootHtml = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=' + redirectTargetRoot + '"/><script>window.location.replace("' + redirectTargetRoot + '" + (window.location.search || ""));</script></head><body>Redirecting...</body></html>';
+          fs.writeFileSync(path.join('.gitpagedocs-runtime', 'out', 'index.html'), rootHtml);
+          const projectHtml = '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=' + redirectTargetProject + '"/><script>window.location.replace("' + redirectTargetProject + '" + (window.location.search || ""));</script></head><body>Redirecting...</body></html>';
+          const projectIndexPath = path.join('.gitpagedocs-runtime', 'out', repositoryName, 'index.html');
+          if (fs.existsSync(path.dirname(projectIndexPath))) {
+            fs.writeFileSync(projectIndexPath, projectHtml);
+          }
           NODE
 
       - name: Add .nojekyll
