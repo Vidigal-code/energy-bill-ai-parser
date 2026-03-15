@@ -1,14 +1,14 @@
 {
   "site": {
-    "name": "Git Pages Docs",
+    "name": "energy-bill-ai-parser",
     "defaultLanguage": "en",
     "supportedLanguages": [
       "en",
       "pt",
       "es"
     ],
-    "HideThemeSelector": false,
-    "ThemeDefault": "aurora-dark",
+    "HideThemeSelector": true,
+    "ThemeDefault": "nord-dark",
     "ThemeModeDefault": "dark",
     "ActiveNavigation": true,
     "FocusMode": true,
@@ -17,7 +17,7 @@
     "IconImageMenuHeaderLight": "https://cdn-icons-png.flaticon.com/256/25/25231.png",
     "IconImageMenuHeaderDark": "https://i.pinimg.com/736x/ac/b3/51/acb3513e5a2664ba59bec11222863a40.jpg",
     "IconImageMenuHeaderReactIcones": true,
-    "IconImageMenuHeaderReactIconesTag": "FaGithubAlt",
+    "IconImageMenuHeaderReactIconesTag": "GiEnergise",
     "IconImageMenuHeaderReactIconesTagColorDark": "White",
     "IconImageMenuHeaderReactIconesTagColorLight": "black",
     "IconImageMenuHeaderReactIconesTagSize": "25px",
@@ -31,6 +31,7 @@
     "layoutsConfigPathOficialUrl": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/layoutsConfig.json",
     "repositorySearchHome": false,
     "rendering": "https://vidigal-code.github.io/energy-bill-ai-parser/",
+    "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
     "langmenu": {
       "pt": {
         "pt": "Portugues",
@@ -96,26 +97,8 @@
       {
         "id": "1.0.0",
         "path": "gitpagedocs/docs/versions/1.0.0/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
+        "ProjectLink": "https://github.com/Vidigal-code/energy-bill-ai-parser",
         "PathConfig": "gitpagedocs/docs/versions/1.0.0/config.json",
-        "branch": "",
-        "release": "",
-        "commit": ""
-      },
-      {
-        "id": "1.1.0",
-        "path": "gitpagedocs/docs/versions/1.1.0/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
-        "PathConfig": "gitpagedocs/docs/versions/1.1.0/config.json",
-        "branch": "",
-        "release": "",
-        "commit": ""
-      },
-      {
-        "id": "1.1.1",
-        "path": "gitpagedocs/docs/versions/1.1.1/config.json",
-        "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
-        "PathConfig": "gitpagedocs/docs/versions/1.1.1/config.json",
         "branch": "",
         "release": "",
         "commit": ""

@@ -99,7 +99,7 @@
             "path-click": "gitpagedocs/docs/versions/1.0.0/pt/architecture.md"
           },
           {
-            "title": "Temas e layouts",
+            "title": "Integracoes e extensibilidade",
             "path-click": "gitpagedocs/docs/versions/1.0.0/pt/themes.md"
           },
           {
@@ -117,7 +117,7 @@
             "path-click": "gitpagedocs/docs/versions/1.0.0/en/architecture.md"
           },
           {
-            "title": "Themes and layouts",
+            "title": "Integrations and extensibility",
             "path-click": "gitpagedocs/docs/versions/1.0.0/en/themes.md"
           },
           {
@@ -135,7 +135,7 @@
             "path-click": "gitpagedocs/docs/versions/1.0.0/es/architecture.md"
           },
           {
-            "title": "Temas y layouts",
+            "title": "Integraciones y extensibilidad",
             "path-click": "gitpagedocs/docs/versions/1.0.0/es/themes.md"
           },
           {
