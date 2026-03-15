@@ -1,56 +1,34 @@
-# Integraciones y extensibilidad
+# Temas y layouts
 
-Esta seccion reemplaza la guia generica de "temas" por puntos reales de extension del proyecto.
+Los temas son templates JSON mapeados por `layoutsConfig.json`.
 
-## Providers de IA
+## Archivos
 
-Adapters disponibles:
+- `gitpagedocs/layouts/layoutsConfig.json`
+- `gitpagedocs/layouts/layoutsFallbackConfig.json`
+- `gitpagedocs/layouts/templates/*.json`
 
-- `gemini` (default por soporte PDF multimodal nativo)
-- `openai`
-- `claude`
-- `ollama` (camino local open-source)
+## Modelo de template
 
-Referencias de codigo:
+Cada template normalmente incluye:
 
-- `backend/src/modules/llm/infrastructure/providers/*`
-- `backend/src/modules/llm/application/extraction-response.parser.ts`
+- `id`, `name`, `author`, `version`
+- `mode` y metadatos de par dark/light
+- `colors`
+- `typography`
+- tokens de `components`
+- `animations`
 
-## Estrategia de providers
+## Comportamiento en runtime
 
-- Seleccion en runtime con `LLM_PROVIDER`
-- Prompt/referencia/contexto inyectables por env
-- Salida normalizada al contrato de factura
+- tema activo viene de config/seleccion de usuario
+- toggle light/dark resuelve tema pareado por referencia
+- variables CSS se generan desde tokens del template
 
-Con Ollama:
+## Buenas practicas
 
-- la app puede convertir la primera pagina del PDF a imagen
-- esto habilita flujo local open-source cuando no hay carga PDF nativa
+- mantener contraste accesible
+- mantener escala consistente de espacios y bordes
+- ofrecer variantes dark y light cuando sea posible
 
-## Adapters de almacenamiento
-
-Abstraccion principal de storage:
-
-- Puerto: `backend/src/modules/storage/domain/document-storage.port.ts`
-- Adapter actual: implementacion S3 compatible
-
-Drivers soportados:
-
-- `localstack` para local/desarrollo
-- `aws` para cloud
-
-## Puntos de extension de seguridad
-
-- Integrar secretos con Vault/KMS
-- Aplicar allowlist CORS estricta
-- Enriquecer metadata de auditoria para compliance
-
-## Tema visual del frontend
-
-El frontend actual usa Tailwind + convencion dark/light.
-
-Para evolucionar tema visual:
-
-- centralizar design tokens en `frontend/src/shared`
-- exponer estado de tema en store global
-- mantener contraste consistente en dashboards y tablas
+> Version (ES): 1.0.0

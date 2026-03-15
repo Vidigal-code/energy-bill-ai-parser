@@ -1,77 +1,42 @@
 # Configuracao
 
-O projeto e dirigido por variaveis de ambiente no `.env` da raiz e validadas em `backend/src/shared/config/env.schema.ts`.
+A configuracao de runtime fica em `gitpagedocs/config.json`.
 
-## Core e API
+## Secao `site`
 
-- `NODE_ENV`: `development|test|production`
-- `PORT`: porta do backend (padrao `3000`)
-- `HELMET_ENABLED`: habilita headers HTTP de seguranca
-- `RATE_LIMIT_TTL_MS`: janela do rate limit
-- `RATE_LIMIT_LIMIT`: requisicoes por janela
-- `SWAGGER_ENABLED`: liga/desliga Swagger
-- `SWAGGER_PATH`: caminho da doc (padrao `api/docs`)
-- `LOGS`: liga/desliga logs do backend
+Principais chaves:
 
-## Banco de dados
+- `name`: titulo do projeto no UI
+- `defaultLanguage`: idioma padrao
+- `supportedLanguages`: lista de idiomas disponiveis
+- `HideThemeSelector`: esconde/mostra seletor de tema
+- `ThemeDefault`: id do tema inicial
+- `ThemeModeDefault`: modo inicial (`light` ou `dark`)
+- `ProjectLink`: URL de repositorio para acoes no cabecalho
+- `docsVersion`: versao inicial selecionada
+- `ActiveNavigation`: habilita comportamento de anterior/proximo
+- `FocusMode`: habilita modo foco/leitura
+- `IconImageMenuHeader`: icone principal
+- `layoutsConfigPath`: fallback remoto para layouts
+- `rendering`: URL canonica publicada
 
-- `DATABASE_URL`: string de conexao PostgreSQL
+## Secao `VersionControl`
 
-Schema em `backend/prisma/schema.prisma` com:
+`VersionControl.versions` define:
 
-- `User`, `RefreshToken`
-- `Invoice`, `InvoiceMetrics`
-- `StoredDocument`
-- `AuditLog`
+- `id`: identificador da versao
+- `path`: caminho do config da versao
+- links opcionais (`ProjectLink`, `branch`, `release`, `commit`)
 
-## Autenticacao e RBAC
+## Navegacao e rotas
 
-- `JWT_ACCESS_SECRET`
-- `JWT_REFRESH_SECRET`
-- `JWT_ACCESS_EXPIRES_IN` (padrao `15m`)
-- `JWT_REFRESH_EXPIRES_IN` (padrao `7d`)
-- `JWT_ISSUER`
-- `DEFAULT_ADMIN_EMAIL`
-- `DEFAULT_ADMIN_USERNAME`
-- `DEFAULT_ADMIN_PASSWORD`
+- `routes`: caminhos markdown por idioma
+- `menus-header`: menu hierarquico
+- `translations`: labels de UI para not-found e navegacao
 
-Papeis:
+## Variaveis de ambiente
 
-- `ADMIN`: endpoints globais de governanca (`/api/admin/*`)
-- `USER`: faturas/documentos proprios e dashboards pessoais
+- `GITPAGEDOCS_REPOSITORY_SEARCH`: ativa/desativa busca remota localmente
+- `GITHUB_ACTIONS`: ativa comportamento especifico de GitHub Pages
 
-## Configuracao de IA
-
-- `OPEN_SOURCE_IA`: `true|false`
-- `LLM_PROVIDER`: `ollama|openai|gemini|google|claude`
-
-Detalhes por provider:
-
-- `OLLAMA_BASE_URL`, `OLLAMA_MODEL`
-- `OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_API_KEY`
-- `GEMINI_BASE_URL`, `GEMINI_MODEL`, `GEMINI_API_KEY`
-- `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`, `ANTHROPIC_API_KEY`
-
-Personalizacao da extracao:
-
-- `INVOICE_EXTRACTION_REFERENCE`
-- `INVOICE_EXTRACTION_PROMPT`
-- `INVOICE_EXTRACTION_CONTEXT`
-
-## Upload e armazenamento
-
-- `PDF_MAX_FILE_SIZE_MB`
-- `ROLLBACK_ON_INVOICE_FAILURE`
-- `JWE_SECRET` (minimo 32 caracteres)
-- `STORAGE_DRIVER`: `aws|localstack`
-- `S3_REGION`, `S3_BUCKET`
-- `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`
-- `S3_FORCE_PATH_STYLE`
-
-## Runtime do frontend
-
-- `FRONTEND_PORT` (mapeamento de host padrao `3001`)
-- `BACKEND_API_URL` (chamadas server-side no Next)
-- `NEXT_PUBLIC_BACKEND_API_URL` (URL de API exposta ao browser)
-
-O frontend resolve URL da API em `frontend/src/shared/config/server-env.ts`.
+> Versao: 1.0.0

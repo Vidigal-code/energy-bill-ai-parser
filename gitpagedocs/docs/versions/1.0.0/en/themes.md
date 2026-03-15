@@ -1,56 +1,34 @@
-# Integrations and Extensibility
+# Themes and Layouts
 
-This section replaces generic "themes" guidance with practical extension points of this project.
+Themes are JSON templates mapped by `layoutsConfig.json`.
 
-## AI providers
+## Strategy options
 
-Available provider adapters:
+- Default mode (`npx gitpagedocs`): use official layouts/templates from the upstream repository.
+- Local mode (`npx gitpagedocs --layoutconfig`): generate and use local templates from your repository.
 
-- `gemini` (default for native PDF multimodal support)
-- `openai`
-- `claude`
-- `ollama` (open-source local model path)
+## Local layout files
 
-Code references:
+- `gitpagedocs/layouts/layoutsConfig.json`
+- `gitpagedocs/layouts/layoutsFallbackConfig.json`
+- `gitpagedocs/layouts/templates/*.json`
 
-- `backend/src/modules/llm/infrastructure/providers/*`
-- `backend/src/modules/llm/application/extraction-response.parser.ts`
+## Template model
 
-## Provider strategy
+Each template usually includes:
 
-- Selection is runtime-based through `LLM_PROVIDER`
-- Prompt/reference/context can be injected by env
-- Output is normalized to invoice contract fields
+- `id`, `name`, `author`, `version`
+- `mode` + dark/light pairing metadata
+- `colors`
+- `typography`
+- `components`
+- `animations`
 
-When using Ollama:
+## Runtime behavior
 
-- the app can convert first PDF page to image for vision-compatible calls
-- this helps local open-source workflows where direct PDF upload is unavailable
+- Active theme is resolved from config/user selection.
+- Light/dark toggle resolves paired theme via reference.
+- CSS variables are generated from template tokens.
+- Runtime includes fallback behavior if a source is unavailable.
 
-## Storage adapters
-
-Primary document storage abstraction:
-
-- Port: `backend/src/modules/storage/domain/document-storage.port.ts`
-- Default adapter: S3-compatible implementation
-
-Current drivers:
-
-- `localstack` for local/development
-- `aws` for cloud deployments
-
-## Security extension points
-
-- Replace secrets management with Vault/KMS integrations
-- Add stronger CORS origin allowlist policy
-- Extend audit metadata for compliance rules
-
-## Frontend UI theming
-
-Current frontend uses Tailwind + dark/light mode conventions.
-
-To evolve visual themes:
-
-- centralize design tokens in `frontend/src/shared`
-- expose theme switcher state in global store
-- keep contrast parity for dashboard and table components
+> Version: 1.0.0
