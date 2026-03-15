@@ -32,15 +32,7 @@
     "preRenderRepositories": [
       {
         "owner": "Vidigal-code",
-        "repo": "git-page-docs"
-      },
-      {
-        "owner": "Vidigal-code",
-        "repo": "git-page-link-create"
-      },
-      {
-        "owner": "Vidigal-code",
-        "repo": "git-page-docs-example"
+        "repo": "energy-bill-ai-parser"
       }
     ],
     "rendering": "https://vidigal-code.github.io/git-page-docs/",
