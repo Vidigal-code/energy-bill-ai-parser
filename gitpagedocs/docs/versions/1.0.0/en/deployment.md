@@ -1,62 +1,43 @@
 # Deployment
 
-Production-ready deployment can run with Docker Compose or separated services.
+Git Page Docs supports two usage models:
 
-## Docker Compose deployment (reference path)
+1. Use the official viewer site
+2. Self-host your own GitHub Pages runtime
 
-At repository root:
+## Official viewer site
 
-1. Ensure `.env` exists and has production-safe secrets
-2. Run `docker compose up --build -d`
-3. Verify health:
-   - `GET /api/health`
-   - frontend `/login`
+Use:
 
-Services started:
+- `https://vidigal-code.github.io/git-page-docs/`
 
-- `postgres` (database)
-- `localstack` (S3-compatible storage in local/dev scenarios)
-- `backend` (NestJS API)
-- `frontend` (Next.js app)
+Provide owner + repository to load docs from repositories that contain `gitpagedocs/`.
 
-Optional:
+## Self-hosted GitHub Pages
 
-- `backend-tests` with profile `test`
-- `ollama` and `ollama-init` (commented by default)
+1. Generate docs:
+   - `npx gitpagedocs`
+   - or `npx gitpagedocs --layoutconfig` for local templates
+2. Set `site.rendering` in `gitpagedocs/config.json`:
+   - `https://<your-user>.github.io/<your-repo>/`
+3. Build and validate:
+   - `npm run lint`
+   - `npm run build`
+4. Deploy with GitHub Pages workflow.
 
-## Backend startup behavior
+When `GITHUB_ACTIONS=true`, runtime applies GitHub Pages behavior.
 
-The backend container command runs:
+## npm publish flows
 
-- `npx prisma db push`
-- `node dist/src/main.js`
+Recommended: GitHub Release + CI publish.
 
-This means schema sync happens on startup before serving API.
+Manual fallback:
 
-## Minimum production checklist
+1. `npm whoami`
+2. `npm run lint`
+3. `npm run build`
+4. `npm pack --ignore-scripts`
+5. `npm version patch`
+6. `npm publish --access public`
 
-- Set strong values for `JWT_*` and `JWE_SECRET`
-- Disable verbose logs if needed (`LOGS=false`)
-- Restrict CORS origin strategy if required
-- Use managed PostgreSQL with secure credentials
-- Use real S3 (`STORAGE_DRIVER=aws`) for cloud deployments
-- Store provider keys securely (`GEMINI_API_KEY`, etc.)
-
-## Suggested release workflow
-
-1. Build and test backend and frontend
-2. Run extraction smoke test with a real invoice
-3. Deploy stack
-4. Run post-deploy checks:
-   - Auth flow (`register/login/refresh/logout`)
-   - Invoice extraction
-   - Dashboard values
-   - Admin governance endpoints
-
-## Horizontal scaling notes
-
-- API is stateless (JWT-based), suitable for multiple instances
-- Shared dependencies must be externalized:
-  - PostgreSQL
-  - S3-compatible storage
-- Rate-limit settings should align with traffic profile
+> Version: 1.0.0

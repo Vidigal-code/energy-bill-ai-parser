@@ -1,71 +1,40 @@
 # Primeros pasos
 
-Levanta la plataforma completa (backend + frontend + infraestructura) desde cero.
+Esta guia lleva el proyecto desde cero hasta docs corriendo.
 
 ## Requisitos
 
 - Node.js 20+
-- npm 10+
-- Docker Desktop (recomendado para stack completa)
+- npm 10+ (o pnpm)
 
-## 1) Configura el entorno
+## Setup local
 
-En la raiz del repositorio:
+1. Instala dependencias:
+   - `npm install`
+2. Genera/actualiza artefactos de docs:
+   - `npm run gitpagedocs`
+3. Inicia desarrollo:
+   - `npm run dev`
+4. Build + ejecucion local de produccion:
+   - `npm run build`
+   - `npm start`
 
-1. Copia `envexample.txt` a `.env`
-2. Define tus secretos y llaves de provider (al menos un provider)
+## Comportamiento de la CLI
 
-Perfil recomendado para el desafio:
+`npx gitpagedocs` (o `npm run gitpagedocs`) genera artefactos en la carpeta oficial `gitpagedocs/`.
 
-- `OPEN_SOURCE_IA=false`
-- `LLM_PROVIDER=gemini`
-- `GEMINI_API_KEY=<tu_clave>`
+- Genera solo markdown/json
+- No genera `index.html`
+- No genera `index.js`
+- No ejecuta comandos de instalacion
 
-## 2) Ejecuta con Docker (recomendado)
+## Modo de busqueda por repositorio
 
-En la raiz del repositorio:
+En local, se controla por variable:
 
-1. `docker compose up --build`
-2. Espera los healthchecks de los servicios
-3. Abre `http://localhost:3001`
+- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
+- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
 
-Perfil opcional de pruebas:
+En build de GitHub Pages (`GITHUB_ACTIONS=true`), la busqueda de repositorio siempre esta activa.
 
-- `docker compose --profile test up backend-tests --build`
-
-## 3) Ejecuta sin Docker (procesos locales)
-
-Backend (`/backend`):
-
-1. `npm install`
-2. `npx prisma db push`
-3. `npm run start:dev`
-
-Frontend (`/frontend`):
-
-1. `npm install`
-2. `npm run dev`
-
-Sin Docker tambien necesitas PostgreSQL + storage compatible S3 (o LocalStack).
-
-## 4) Primer flujo funcional
-
-1. Registra un usuario en frontend (`/register`) o `POST /api/auth/register`
-2. Inicia sesion y sube un PDF real en `/invoices`
-3. Valida salida de extraccion y dashboards
-4. (Admin) revisa los registros en `/admin`
-
-## 5) Comandos de validacion
-
-- Lint backend: `cd backend && npm run lint`
-- Tests backend: `cd backend && npm run test`
-- Build backend: `cd backend && npm run build`
-- Lint frontend: `cd frontend && npm run lint`
-- Build frontend: `cd frontend && npm run build`
-
-## URLs locales utiles
-
-- Frontend: `http://localhost:3001`
-- API base: `http://localhost:3000/api`
-- Swagger EN: `http://localhost:3000/api/docs/en`
-- Swagger PT: `http://localhost:3000/api/docs/pt`
+> Version (ES): 1.0.0
