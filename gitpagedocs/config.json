@@ -29,6 +29,7 @@
     "layoutsConfigPathOficial": true,
     "layoutsConfigPathTemplatesOficial": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/templates",
     "layoutsConfigPathOficialUrl": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/layoutsConfig.json",
+    "repositorySearchHome": false,
     "rendering": "https://vidigal-code.github.io/energy-bill-ai-parser/",
     "ProjectLink": "https://github.com/vidigal-code/energy-bill-ai-parser",
     "langmenu": {
