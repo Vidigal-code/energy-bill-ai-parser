@@ -1,0 +1,179 @@
+{
+  "site": {
+    "name": "energy-bill-ai-parser",
+    "defaultLanguage": "en",
+    "supportedLanguages": [
+      "en",
+      "pt",
+      "es"
+    ],
+    "HideThemeSelector": true,
+    "ThemeDefault": "oceanic-dark",
+    "ThemeModeDefault": "dark",
+    "ActiveNavigation": true,
+    "FocusMode": true,
+    "FooterEnabled": true,
+    "IconImageMenuHeader": "/icon.svg",
+    "IconImageMenuHeaderLight": "https://cdn-icons-png.flaticon.com/256/25/25231.png",
+    "IconImageMenuHeaderDark": "https://i.pinimg.com/736x/ac/b3/51/acb3513e5a2664ba59bec11222863a40.jpg",
+    "IconImageMenuHeaderReactIcones": true,
+    "IconImageMenuHeaderReactIconesTag": "GoHomeFill",
+    "IconImageMenuHeaderReactIconesTagColorDark": "White",
+    "IconImageMenuHeaderReactIconesTagColorLight": "black",
+    "IconImageMenuHeaderReactIconesTagSize": "25px",
+    "IconProjectLinkReactIcones": true,
+    "IconProjectLinkReactIconesTag": "FaGithubAlt",
+    "IconProjectLinkReactIconesTagColorDark": "White",
+    "IconProjectLinkReactIconesTagColorLight": "black",
+    "IconProjectLinkReactIconesTagSize": "25px",
+    "layoutsConfigPathOficial": true,
+    "layoutsConfigPathTemplatesOficial": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/templates",
+    "layoutsConfigPathOficialUrl": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/layoutsConfig.json",
+    "preRenderRepositories": [
+      {
+        "owner": "Vidigal-code",
+        "repo": "git-page-docs"
+      },
+      {
+        "owner": "Vidigal-code",
+        "repo": "git-page-link-create"
+      },
+      {
+        "owner": "Vidigal-code",
+        "repo": "git-page-docs-example"
+      }
+    ],
+    "rendering": "https://vidigal-code.github.io/git-page-docs/",
+    "langmenu": {
+      "pt": {
+        "pt": "Portugues",
+        "en": "Ingles",
+        "es": "Espanhol",
+        "menuOpen": "Menu",
+        "menuClose": "Fechar",
+        "showMenu": "Abrir menu",
+        "hideMenu": "Fechar menu",
+        "quickNavigation": "Ctrl+K",
+        "searchOwnerLabel": "Usuario (ex: Vidigal-code)",
+        "searchRepoLabel": "Repositorio (ex: git-page-link-create)",
+        "searchButtonLabel": "Buscar",
+        "typeToNavigate": "Digite para navegar...",
+        "noNavigationResults": "Nenhum resultado de navegacao.",
+        "focusMode": "Modo foco",
+        "versionLinksLabel": "Links do repositorio",
+        "darkMode": "Modo escuro",
+        "lightMode": "Modo claro"
+      },
+      "en": {
+        "pt": "Portuguese",
+        "en": "English",
+        "es": "Spanish",
+        "menuOpen": "Menu",
+        "menuClose": "Close",
+        "showMenu": "Show menu",
+        "hideMenu": "Hide menu",
+        "quickNavigation": "Ctrl+K",
+        "searchOwnerLabel": "Owner (ex: Vidigal-code)",
+        "searchRepoLabel": "Repository (ex: git-page-link-create)",
+        "searchButtonLabel": "Search",
+        "typeToNavigate": "Type to navigate...",
+        "noNavigationResults": "No navigation results.",
+        "focusMode": "Focus mode",
+        "versionLinksLabel": "Repository links",
+        "darkMode": "Dark mode",
+        "lightMode": "Light mode"
+      },
+      "es": {
+        "pt": "Portugues",
+        "en": "Ingles",
+        "es": "Espanol",
+        "menuOpen": "Menu",
+        "menuClose": "Cerrar",
+        "showMenu": "Abrir menu",
+        "hideMenu": "Cerrar menu",
+        "quickNavigation": "Ctrl+K",
+        "searchOwnerLabel": "Usuario (ej: Vidigal-code)",
+        "searchRepoLabel": "Repositorio (ej: git-page-link-create)",
+        "searchButtonLabel": "Buscar",
+        "typeToNavigate": "Escribe para navegar...",
+        "noNavigationResults": "Sin resultados de navegacion.",
+        "focusMode": "Modo foco",
+        "versionLinksLabel": "Enlaces del repositorio",
+        "darkMode": "Modo oscuro",
+        "lightMode": "Modo claro"
+      }
+    }
+  },
+  "VersionControl": {
+    "versions": [
+      {
+        "id": "1.0.0",
+        "path": "gitpagedocs/docs/versions/1.0.0/config.json",
+        "ProjectLink": "https://github.com/Vidigal-code/git-page-docs",
+        "PathConfig": "gitpagedocs/docs/versions/1.0.0/config.json",
+        "branch": "",
+        "release": "",
+        "commit": ""
+      },
+      {
+        "id": "1.1.0",
+        "path": "gitpagedocs/docs/versions/1.1.0/config.json",
+        "ProjectLink": "https://github.com/Vidigal-code/git-page-docs",
+        "PathConfig": "gitpagedocs/docs/versions/1.1.0/config.json",
+        "branch": "",
+        "release": "",
+        "commit": ""
+      },
+      {
+        "id": "1.1.1",
+        "path": "gitpagedocs/docs/versions/1.1.1/config.json",
+        "ProjectLink": "https://github.com/Vidigal-code/git-page-docs",
+        "PathConfig": "gitpagedocs/docs/versions/1.1.1/config.json",
+        "branch": "",
+        "release": "",
+        "commit": ""
+      }
+    ]
+  },
+  "translations": {
+    "notFound": {
+      "title": {
+        "pt": "Pagina nao encontrada",
+        "en": "Page not found",
+        "es": "Pagina no encontrada"
+      },
+      "description": {
+        "pt": "A pagina de documentacao solicitada nao existe neste contexto de repositorio.",
+        "en": "The requested documentation page does not exist in this repository context.",
+        "es": "La pagina de documentacion solicitada no existe en este contexto de repositorio."
+      },
+      "returnHome": {
+        "pt": "Voltar para inicio",
+        "en": "Return Home",
+        "es": "Volver al inicio"
+      }
+    },
+    "navigation": {
+      "previous": {
+        "pt": "Voltar",
+        "en": "Previous",
+        "es": "Volver"
+      },
+      "next": {
+        "pt": "Avancar markdown",
+        "en": "Next Markdown",
+        "es": "Avanzar markdown"
+      },
+      "menuOpen": {
+        "pt": "Menu",
+        "en": "Menu",
+        "es": "Menu"
+      },
+      "menuClose": {
+        "pt": "Fechar",
+        "en": "Close",
+        "es": "Cerrar"
+      }
+    }
+  }
+}
