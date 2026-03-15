@@ -1,45 +1,71 @@
 # Getting Started
 
-This guide configures your repository from zero to running docs.
+Run the entire platform (backend + frontend + infrastructure) from zero.
 
 ## Prerequisites
 
 - Node.js 20+
 - npm 10+
+- Docker Desktop (recommended for full stack)
 
-## Install and generate
+## 1) Configure environment
 
-1. Install package:
-   - `npm install gitpagedocs`
-2. Generate docs config and versions:
-   - `npx gitpagedocs`
-3. Optional: generate local layouts/templates:
-   - `npx gitpagedocs --layoutconfig`
+At repository root:
 
-## Local run
+1. Copy `envexample.txt` to `.env`
+2. Set your secrets and provider keys (at least one provider)
 
-1. Development:
-   - `npm run dev`
-2. Production locally:
-   - `npm run build`
-   - `npm start`
+Recommended challenge profile:
 
-## CLI behavior
+- `OPEN_SOURCE_IA=false`
+- `LLM_PROVIDER=gemini`
+- `GEMINI_API_KEY=<your_key>`
 
-`npx gitpagedocs` generates only artifacts in `gitpagedocs/`:
+## 2) Run with Docker (recommended)
 
-- JSON + markdown docs assets
-- No `index.html`
-- No `index.js`
-- No install command execution
+At repository root:
 
-## Repository search mode
+1. `docker compose up --build`
+2. Wait for service healthchecks
+3. Open `http://localhost:3001`
 
-Local repository search is controlled by:
+Optional test profile:
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
-- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
+- `docker compose --profile test up backend-tests --build`
 
-On GitHub Pages builds (`GITHUB_ACTIONS=true`), repository-search home is enabled.
+## 3) Run without Docker (local processes)
 
-> Version: 1.0.0
+Backend (`/backend`):
+
+1. `npm install`
+2. `npx prisma db push`
+3. `npm run start:dev`
+
+Frontend (`/frontend`):
+
+1. `npm install`
+2. `npm run dev`
+
+You still need PostgreSQL + S3-compatible storage (or LocalStack).
+
+## 4) First functional flow
+
+1. Register a user in the frontend (`/register`) or `POST /api/auth/register`
+2. Login and upload a real bill PDF in `/invoices`
+3. Validate extraction output and dashboards
+4. (Admin) review records in `/admin`
+
+## 5) Validation commands
+
+- Backend lint: `cd backend && npm run lint`
+- Backend tests: `cd backend && npm run test`
+- Backend build: `cd backend && npm run build`
+- Frontend lint: `cd frontend && npm run lint`
+- Frontend build: `cd frontend && npm run build`
+
+## Useful local URLs
+
+- Frontend: `http://localhost:3001`
+- API base: `http://localhost:3000/api`
+- Swagger EN: `http://localhost:3000/api/docs/en`
+- Swagger PT: `http://localhost:3000/api/docs/pt`
