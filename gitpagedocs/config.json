@@ -8,7 +8,7 @@
       "es"
     ],
     "HideThemeSelector": true,
-    "ThemeDefault": "oceanic-dark",
+    "ThemeDefault": "nord-dark",
     "ThemeModeDefault": "dark",
     "ActiveNavigation": true,
     "FocusMode": true,
