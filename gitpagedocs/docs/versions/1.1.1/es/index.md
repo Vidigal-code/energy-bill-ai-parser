@@ -30,4 +30,4 @@ El runtime espera esta estructura:
 - Abre **Temas y layouts** para creacion de templates.
 - Abre **FAQ** para troubleshooting.
 
-> Version (ES): 1.0.0
+> Version (ES): 1.1.1

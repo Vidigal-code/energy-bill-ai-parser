@@ -37,4 +37,4 @@ No ambiente local, o controle e por variavel:
 
 Em build de GitHub Pages (`GITHUB_ACTIONS=true`), a busca de repositorio fica sempre ativa.
 
-> Versao: 1.0.0
+> Versao: 1.1.1

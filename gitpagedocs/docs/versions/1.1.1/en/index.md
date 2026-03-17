@@ -30,4 +30,4 @@ The runtime expects this structure:
 - Open **Themes and layouts** for template authoring details.
 - Open **FAQ** for troubleshooting.
 
-> Version: 1.0.0
+> Version: 1.1.1
