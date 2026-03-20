@@ -1,28 +1,12 @@
-# Fundamentos tecnicos
+# Introducao ao Git
 
-Fundamentos tecnicos usados neste repositorio.
+Conceitos basicos de Git para iniciantes.
 
-## Fundamentos de backend
+## Comandos essenciais
 
-- Arquitetura modular NestJS
-- Modelo de dados Prisma + PostgreSQL
-- JWT com RBAC
-- Camada de extracao IA por provider
+- `git init` - iniciar repositorio
+- `git add` - preparar alteracoes
+- `git commit` - registrar commit
+- `git push` - enviar para remoto
 
-## Fundamentos de frontend
-
-- Estrutura Next.js App Router
-- Sessao por cookies HTTP-only
-- Estrategia de estado com Redux Toolkit + React Query
-
-## Fundamentos de infraestrutura
-
-- Docker Compose para paridade local
-- LocalStack para emulacao S3
-- Configuracao orientada por ambiente
-
-## Fundamentos operacionais
-
-- Healthcheck para readiness
-- Respostas API padronizadas
-- Auditoria para acoes sensiveis
+> Versao: 1.0.0

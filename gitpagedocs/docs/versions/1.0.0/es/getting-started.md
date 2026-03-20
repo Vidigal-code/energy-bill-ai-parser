@@ -1,60 +1,40 @@
 # Primeros pasos
 
-Esta guia levanta `energy-bill-ai-parser` desde cero.
+Esta guia lleva el proyecto desde cero hasta docs corriendo.
 
 ## Requisitos
 
 - Node.js 20+
-- npm 10+
-- Docker Desktop (recomendado)
+- npm 10+ (o pnpm)
 
-## Configuracion de entorno
+## Setup local
 
-1. Copia `envexample.txt` a `.env`
-2. Completa secrets y llaves de provider
-3. Mantiene defaults para entorno local cuando sea posible
+1. Instala dependencias:
+   - `npm install`
+2. Genera/actualiza artefactos de docs:
+   - `npm run gitpagedocs`
+3. Inicia desarrollo:
+   - `npm run dev`
+4. Build + ejecucion local de produccion:
+   - `npm run build`
+   - `npm start`
 
-Perfil recomendado:
+## Comportamiento de la CLI
 
-- `OPEN_SOURCE_IA=false`
-- `LLM_PROVIDER=gemini`
-- `GEMINI_API_KEY=<tu_clave>`
+`npx gitpagedocs` (o `npm run gitpagedocs`) genera artefactos en la carpeta oficial `gitpagedocs/`.
 
-## Ejecutar con Docker
+- Genera solo markdown/json
+- No genera `index.html`
+- No genera `index.js`
+- No ejecuta comandos de instalacion
 
-Desde la raiz:
+## Modo de busqueda por repositorio
 
-```bash
-docker compose up --build
-```
+En local, se controla por variable:
 
-URLs principales:
+- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
+- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
 
-- Frontend: `http://localhost:3001`
-- API: `http://localhost:3000/api`
-- Swagger EN: `http://localhost:3000/api/docs/en`
-- Health: `http://localhost:3000/api/health`
+En build de GitHub Pages (`GITHUB_ACTIONS=true`), la busqueda de repositorio siempre esta activa.
 
-## Ejecutar sin Docker
-
-Backend:
-
-```bash
-cd backend
-npm install
-npx prisma db push
-npm run start:dev
-```
-
-Frontend:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Validacion basica
-
-- `cd backend && npm run lint && npm run test`
-- `cd frontend && npm run lint && npm run build`
+> Version (ES): 1.0.0
