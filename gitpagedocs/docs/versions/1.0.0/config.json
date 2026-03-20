@@ -105,7 +105,7 @@
         "es": "Ver codigo fuente del proyecto"
       },
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/en/source-viewer",
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-viewer",
         "en": "gitpagedocs/docs/versions/1.0.0/en/source-viewer",
         "es": "gitpagedocs/docs/versions/1.0.0/es/source-viewer"
       }
@@ -220,7 +220,7 @@
       "id": 1,
       "pt": {
         "title": "Codigo fonte",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-viewer"
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-viewer"
       },
       "en": {
         "title": "Source code",
