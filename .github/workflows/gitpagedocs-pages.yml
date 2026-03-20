@@ -56,7 +56,6 @@ jobs:
         env:
           GITHUB_ACTIONS: "true"
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITPAGEDOCS_BASE_PATH: "/${{ github.event.repository.name }}/git-docs"
 
       - name: Force root URL to docs entrypoint
         env:
@@ -65,7 +64,7 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-          const pathSegment = "git-docs";
+          const pathSegment = "";
           const repoName = (process.env.GITHUB_REPOSITORY || '').split('/')[1] || '';
           const rootRedirectBase = pathSegment;
           const cfgPath = path.join('.gitpagedocs-runtime', 'gitpagedocs', 'config.json');
