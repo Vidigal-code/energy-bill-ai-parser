@@ -1,45 +1,60 @@
 # Getting Started
 
-This guide configures your repository from zero to running docs.
+This guide bootstraps `energy-bill-ai-parser` from zero.
 
 ## Prerequisites
 
 - Node.js 20+
 - npm 10+
+- Docker Desktop (recommended)
 
-## Install and generate
+## Environment setup
 
-1. Install package:
-   - `npm install gitpagedocs`
-2. Generate docs config and versions:
-   - `npx gitpagedocs`
-3. Optional: generate local layouts/templates:
-   - `npx gitpagedocs --layoutconfig`
+1. Copy `envexample.txt` to `.env`
+2. Fill provider keys and secrets
+3. Keep defaults for local stack when possible
 
-## Local run
+Recommended profile:
 
-1. Development:
-   - `npm run dev`
-2. Production locally:
-   - `npm run build`
-   - `npm start`
+- `OPEN_SOURCE_IA=false`
+- `LLM_PROVIDER=gemini`
+- `GEMINI_API_KEY=<your_key>`
 
-## CLI behavior
+## Run with Docker
 
-`npx gitpagedocs` generates only artifacts in `gitpagedocs/`:
+From repository root:
 
-- JSON + markdown docs assets
-- No `index.html`
-- No `index.js`
-- No install command execution
+```bash
+docker compose up --build
+```
 
-## Repository search mode
+Main URLs:
 
-Local repository search is controlled by:
+- Frontend: `http://localhost:3001`
+- API: `http://localhost:3000/api`
+- Swagger EN: `http://localhost:3000/api/docs/en`
+- Health: `http://localhost:3000/api/health`
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
-- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
+## Run without Docker
 
-On GitHub Pages builds (`GITHUB_ACTIONS=true`), repository-search home is enabled.
+Backend:
 
-> Version: 1.0.0
+```bash
+cd backend
+npm install
+npx prisma db push
+npm run start:dev
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Basic validation
+
+- `cd backend && npm run lint && npm run test`
+- `cd frontend && npm run lint && npm run build`

@@ -1,19 +1,28 @@
-# Introduction to Git
+# Technical Foundations
 
-Basic Git concepts for beginners.
+Technical foundations used by this repository.
 
-## Key concepts
+## Backend fundamentals
 
-- **Repository**: A project folder tracked by Git
-- **Commit**: A snapshot of changes
-- **Branch**: Alternative line of development
-- **Remote**: Shared repository (e.g. on GitHub)
+- NestJS modular architecture
+- Prisma + PostgreSQL data model
+- JWT auth and RBAC policy
+- Provider-based AI extraction layer
 
-## Common commands
+## Frontend fundamentals
 
-- `git init` - Initialize a repo
-- `git add` - Stage changes
-- `git commit` - Create a snapshot
-- `git push` - Send to remote
+- Next.js App Router structure
+- Session via HTTP-only cookies
+- Redux Toolkit + React Query state strategy
 
-> Version: 1.0.0
+## Infrastructure fundamentals
+
+- Docker Compose for local parity
+- LocalStack for S3 emulation
+- Environment-first configuration
+
+## Operational fundamentals
+
+- Healthcheck-first readiness
+- Standardized API responses
+- Audit logging for key actions

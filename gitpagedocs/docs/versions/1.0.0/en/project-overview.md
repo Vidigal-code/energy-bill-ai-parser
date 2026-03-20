@@ -1,23 +1,42 @@
-# Project Overview
+# Project Architecture
 
-Git Page Docs is powered by Next.js 15, React 19, TypeScript, and Node.js. It builds multilingual documentation for GitHub Pages.
+Current architecture of `energy-bill-ai-parser` for version `1.0.0`.
 
-## Stack
+## Repository layout
 
-- Next.js 15 with App Router
-- React 19
-- TypeScript
-- Static export for GitHub Pages
-- gray-matter, marked for Markdown
-- react-icons
-- ESLint
+- `backend/`: NestJS API
+- `frontend/`: Next.js App Router UI
+- `docker-compose.yml`: infrastructure and app orchestration
 
-## Goals
+## Backend modules
 
-- Generate and maintain a `gitpagedocs/` folder with config and versioned content
-- Support Markdown, HTML (local or URL), and video embeds
-- Multilingual: en, pt, es
-- Theme system with JSON templates
-- Local and GitHub Pages execution
+- `auth`: register, login, refresh, logout, profile
+- `invoices`: upload, extraction, listings, dashboards
+- `admin`: management of users, documents, invoices, audit logs
+- `llm`: provider abstraction and parsing
+- `storage`: JWE + S3-compatible adapters
+- `audit`: action trail and governance
+- `health`: service liveness endpoint
 
-> Version: 1.0.0
+## Frontend modules
+
+- Route pages: `login`, `register`, `dashboard`, `invoices`, `profile`, `admin`
+- Session strategy: HTTP-only cookies
+- API routes: `api/auth/*` and `api/proxy/[...path]`
+
+## Data flow (invoice extraction)
+
+1. PDF upload
+2. Validation (type + max size)
+3. JWE encryption
+4. S3 storage
+5. AI extraction by selected provider
+6. Metric computation
+7. Persistence + audit logging
+
+## Security model
+
+- JWT auth and RBAC (`ADMIN`, `USER`)
+- Refresh token rotation
+- Global rate-limit and helmet headers
+- Standardized success/error response contract

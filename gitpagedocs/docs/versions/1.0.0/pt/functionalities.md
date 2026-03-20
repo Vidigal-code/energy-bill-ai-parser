@@ -1,68 +1,46 @@
 # Funcionalidades
 
-Referencia completa de opcoes da CLI, chaves de configuracao e recursos do runtime.
+Mapa funcional do `energy-bill-ai-parser`.
 
-## Comandos da CLI
+## Autenticacao
 
-| Comando | Descricao |
-|---------|------------|
-| `npx gitpagedocs` | Gera config e docs em `gitpagedocs/` |
-| `npx gitpagedocs --layoutconfig` | Tambem gera layouts/templates locais |
-| `npx gitpagedocs --home` | Distribuicao standalone (`gitpagedocshome/`) |
-| `npx gitpagedocs --push --owner X --repo Y` | Configura workflow, commit, push |
-| `npx gitpagedocs --interactive` / `-i` | Modo interativo com prompts |
+- Registro e login de usuario
+- Fluxo de refresh token e logout seguro
+- Perfil do usuario autenticado
+- Controle por papel (`ADMIN`, `USER`)
 
-## Opcoes da CLI
+## Processamento de faturas
 
-| Opcao | Descricao |
-|-------|-----------|
-| `--owner <user>` | Owner do GitHub |
-| `--repo <repo>` | Repositorio GitHub |
-| `--path <subpath>` | Subcaminho dos docs (ex: `docs`); sem ele, base path = nome do repo para CSS/JS em project sites |
-| `--output <dir>` | Diretorio de saida (padrao: `gitpagedocs`) |
-| `--search true|false` | Habilita/desabilita busca de repositorio (`--home`) |
-| `--layoutconfig` | Gera `gitpagedocs/layouts/` |
-| `--push` | Cria workflow, commit de artefatos, push |
-| `--home` | Gera `gitpagedocshome/` (estatico + .env + Dockerfile) |
+- Endpoint de upload de PDF
+- Extracao com abstracao de providers IA:
+  - `gemini`
+  - `openai`
+  - `claude`
+  - `ollama`
+- Normalizacao de saida estruturada
+- Historico persistido com filtros
 
-## Saida gerada
+## Dashboards
 
-- `gitpagedocs/config.json` – config raiz
-- `gitpagedocs/icon.svg` – icone padrao
-- `gitpagedocs/docs/versions/<ver>/config.json` – rotas por versao
-- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/*.md` – docs em markdown
-- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/source-viewer` – visualizador de codigo (estilo GitHub)
-- `gitpagedocs/layouts/` – apenas com `--layoutconfig`
+- Dashboard de energia (`kWh`)
+- Dashboard financeiro (`R$`)
+- Dashboard consolidado
 
-## Tipos de conteudo
+## Administracao
 
-| Tipo | Chave config | Descricao |
-|------|--------------|-----------|
-| Markdown | `routes-md` | Arquivos .md com `path` por idioma |
-| HTML | `routes-html` | `path` (ex: source-viewer) ou `url` externa |
-| Video | `routes-video` | `video.pathVideo`, `video.videoType` |
-| Audio | `routes-audio` | `audio.pathAudio`, `audio.audioType` |
+- Gestao de usuarios
+- Governanca de faturas e documentos
+- Consulta de logs de auditoria
+- Download e exclusao segura de documentos
 
-## Visualizador de codigo fonte
+## Storage e auditoria
 
-A CLI gera uma pagina **Codigo fonte** por versao. Escaneia `src/`, `cli/` e arquivos raiz (README.md, package.json, next.config.ts, etc.) e constroi um visualizador estilo GitHub em modo escuro com:
+- Documento criptografado (JWE)
+- Armazenamento em bucket S3 compativel
+- Rastreabilidade de operacoes sensiveis
 
-- Arvore de arquivos na lateral com expandir/recolher pastas
-- Filtro de busca
-- Destaque de sintaxe (TypeScript, JavaScript, JSON, CSS, Markdown)
-- Botao copiar, numeros de linha
-- Alternar preview/codigo do README.md
-- Controles Expandir tudo / Recolher tudo
+## API + Docs + codigo
 
-## Chaves de config (site)
-
-- `name`, `defaultLanguage`, `supportedLanguages`
-- `docsVersion`, `rendering`, `ThemeDefault`, `ThemeModeDefault`
-- `ProjectLink`, `layoutsConfigPathOficial`, `layoutsConfigPath`
-
-## Variaveis de ambiente
-
-- `GITPAGEDOCS_REPOSITORY_SEARCH` – busca de repositorio (local)
-- `GITHUB_ACTIONS` – modo build GitHub Pages
-
-> Versao: 1.0.0
+- Swagger em EN/PT
+- Endpoint health para observabilidade
+- Rota de visualizacao de codigo nesta versao

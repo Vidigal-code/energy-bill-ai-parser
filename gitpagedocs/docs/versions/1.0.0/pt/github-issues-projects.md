@@ -1,11 +1,40 @@
-# GitHub Issues e Projects
+# Guia de teste pratico
 
-Aprenda a usar GitHub Issues e Projects para gerenciar seu trabalho.
+Fluxo de teste pratico focado neste projeto.
 
-## Conceitos
+## Objetivo do teste pratico
 
-- Issues para rastrear tarefas e bugs
-- Projects para visualizar e organizar o trabalho
-- Workflows recomendados para equipes
+- Subir e processar PDFs reais de faturas
+- Validar campos extraidos e metricas calculadas
+- Demonstrar autenticacao, RBAC e auditoria
 
-> Versao: 1.0.0
+## Validacao por campo
+
+Validar campos de extracao:
+
+- `numeroCliente`
+- `mesReferencia`
+- `itensFatura.energiaEletrica`
+- `itensFatura.energiaSceeSemIcms`
+- `itensFatura.energiaCompensadaGdi`
+- `itensFatura.contribIlumPublicaMunicipal`
+
+Validar metricas:
+
+- `consumoEnergiaEletricaKwh`
+- `energiaCompensadaKwh`
+- `valorTotalSemGdRs`
+- `economiaGdRs`
+
+## Checklist de entrega
+
+- Lint/build/test de backend OK
+- Lint/build de frontend OK
+- Stack Docker saudavel
+- Evidencias funcionais do fluxo completo
+
+## Evidencias sugeridas
+
+- Request/response de extracao
+- Capturas dos dashboards
+- Capturas de admin/auditoria

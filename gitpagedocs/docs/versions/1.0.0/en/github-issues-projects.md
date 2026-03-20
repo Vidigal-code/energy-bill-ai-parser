@@ -1,17 +1,40 @@
-# GitHub Issues and Projects
+# Practical Test Guide
 
-Learn how to use GitHub Issues and Projects to manage your work.
+Practical test workflow focused on this project.
 
-## Issues
+## Practical test objective
 
-- Track bugs, features, and tasks
-- Assignees, labels, milestones
-- Discussions and linked PRs
+- Upload and process real energy bill PDFs
+- Validate extracted fields and computed metrics
+- Demonstrate secure auth, RBAC, and audit trace
 
-## Projects
+## Field-level validation
 
-- Kanban boards
-- Tables and roadmaps
-- Custom fields and automation
+Validate extraction fields:
 
-> Version: 1.0.0
+- `numeroCliente`
+- `mesReferencia`
+- `itensFatura.energiaEletrica`
+- `itensFatura.energiaSceeSemIcms`
+- `itensFatura.energiaCompensadaGdi`
+- `itensFatura.contribIlumPublicaMunicipal`
+
+Validate metrics:
+
+- `consumoEnergiaEletricaKwh`
+- `energiaCompensadaKwh`
+- `valorTotalSemGdRs`
+- `economiaGdRs`
+
+## Delivery checklist
+
+- Backend lint/build/tests passing
+- Frontend lint/build passing
+- Docker stack up and healthy
+- Functional flow recorded with evidence
+
+## Suggested evidence
+
+- API request/response for extraction
+- Dashboard screenshots
+- Admin/audit listing screenshots

@@ -120,7 +120,7 @@
     "IconNavMenuBlockInactiveImgHeight": 20,
     "RouteguideBrandPositionDefault": "center",
     "RouteguideBrandContainerTopDefault": false,
-    "audioPlayerEnabled": true,
+    "audioPlayerEnabled": false,
     "audioAutoPlayOnLoad": false,
     "audioLoopEnabled": false,
     "audioSequentialPlayback": false,

@@ -1,40 +1,60 @@
 # Primeiros passos
 
-Este guia leva o projeto do zero ate docs rodando.
+Este guia sobe o `energy-bill-ai-parser` do zero.
 
-## Pre-requisitos
+## Requisitos
 
 - Node.js 20+
-- npm 10+ (ou pnpm)
+- npm 10+
+- Docker Desktop (recomendado)
 
-## Setup local
+## Configuracao de ambiente
 
-1. Instale dependencias:
-   - `npm install`
-2. Gere/atualize os artefatos de docs:
-   - `npm run gitpagedocs`
-3. Inicie o desenvolvimento:
-   - `npm run dev`
-4. Build e execucao local de producao:
-   - `npm run build`
-   - `npm start`
+1. Copie `envexample.txt` para `.env`
+2. Preencha as chaves e segredos dos providers
+3. Mantenha os defaults para ambiente local quando possivel
 
-## Comportamento da CLI
+Perfil recomendado:
 
-`npx gitpagedocs` (ou `npm run gitpagedocs`) gera os artefatos na pasta oficial `gitpagedocs/`.
+- `OPEN_SOURCE_IA=false`
+- `LLM_PROVIDER=gemini`
+- `GEMINI_API_KEY=<sua_chave>`
 
-- Gera somente markdown/json
-- Nao gera `index.html`
-- Nao gera `index.js`
-- Nao executa comandos de instalacao
+## Executar com Docker
 
-## Modo de busca por repositorio
+Na raiz do repositorio:
 
-No ambiente local, o controle e por variavel:
+```bash
+docker compose up --build
+```
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
-- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
+URLs principais:
 
-Em build de GitHub Pages (`GITHUB_ACTIONS=true`), a busca de repositorio fica sempre ativa.
+- Frontend: `http://localhost:3001`
+- API: `http://localhost:3000/api`
+- Swagger EN: `http://localhost:3000/api/docs/en`
+- Health: `http://localhost:3000/api/health`
 
-> Versao: 1.0.0
+## Executar sem Docker
+
+Backend:
+
+```bash
+cd backend
+npm install
+npx prisma db push
+npm run start:dev
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Validacao basica
+
+- `cd backend && npm run lint && npm run test`
+- `cd frontend && npm run lint && npm run build`
