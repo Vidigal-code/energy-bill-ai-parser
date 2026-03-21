@@ -1,8 +1,7 @@
 {
   "auth": {
     "accessKeys": {
-      "docs-key": "open-gitpagedocs-docs",
-      "source-viewer-key": "open-source-viewer"
+      "docs-key": "open-gitpagedocs-docs"
     },
     "rolesStorageKey": "git-page-docs:route-auth:roles",
     "providers": [
@@ -268,49 +267,7 @@
       }
     }
   ],
-  "routes-html": [
-    {
-      "id": 1,
-      "title": {
-        "pt": "Código fonte",
-        "en": "Source code",
-        "es": "Código fuente"
-      },
-      "description": {
-        "pt": "Visualizar código-fonte do projeto",
-        "en": "View project source code",
-        "es": "Ver código fuente del proyecto"
-      },
-      "titleCss": "font-size: 1.85rem; font-weight: 700;",
-      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titlePosition": "center",
-      "titleIsVisible": true,
-      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
-      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionPosition": "center",
-      "descriptionIsVisible": true,
-      "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-viewer",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/source-viewer",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/source-viewer"
-      },
-      "fullscreenEnabled": true,
-      "marginTop": "",
-      "marginBottom": "",
-      "blockLink": true,
-      "container": "full",
-      "browseAll": false,
-      "RouteguideBrand": true,
-      "RouteGuideSpeciFicbrand": [],
-      "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false,
-      "authorization": {
-        "accessKeyId": "source-viewer-key"
-      }
-    }
-  ],
+  "routes-html": [],
   "routes-video": [
     {
       "id": 1,
@@ -445,23 +402,7 @@
       }
     }
   ],
-  "menus-header-html": [
-    {
-      "id": 1,
-      "pt": {
-        "title": "Código fonte",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-viewer"
-      },
-      "en": {
-        "title": "Source code",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-viewer"
-      },
-      "es": {
-        "title": "Código fuente",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-viewer"
-      }
-    }
-  ],
+  "menus-header-html": [],
   "menus-header-video": [
     {
       "id": 1,
