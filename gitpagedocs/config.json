@@ -1,19 +1,19 @@
 {
   "site": {
-    "name": "Git Pages Docs",
+    "name": "Energy Bill AI Parser",
     "defaultLanguage": "en",
     "supportedLanguages": [
       "en",
       "pt",
       "es"
     ],
-    "HideThemeSelector": false,
-    "ThemeDefault": "aurora-dark",
+    "HideThemeSelector": true,
+    "ThemeDefault": "slate-dark",
     "ThemeModeDefault": "dark",
     "ActiveNavigation": true,
     "FocusMode": true,
     "FooterEnabled": true,
-    "FooterLinkName": "GitPageDocs",
+    "FooterLinkName": "Energy Bill AI Parser",
     "FooterLinkUrl": "https://github.com/vidigal-code/energy-bill-ai-parser",
     "FooterDateMode": "browser",
     "FooterDateCustom": "",
