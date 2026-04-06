@@ -1,35 +1,55 @@
 # Rotas autorizadas
 
-Duas camadas: **este site de documentação** (Git Page Docs) e a **API** do **energy-bill-ai-parser**.
+Proteja rotas por chave de acesso, papeis obrigatorios e provedores externos.
 
-## API da aplicação (NestJS)
+## Local do config de versao
 
-- A maioria das rotas exige **JWT** após login.
-- **RBAC** restringe endpoints administrativos a papéis como `ADMIN`.
-- Rotas públicas incluem **auth** (registo/login) e **health** conforme configuração.
+Configure em:
 
-Consulte o Swagger (`/api/docs/pt`) para a lista exata de rotas e guards.
+- `gitpagedocs/docs/versions/<versao>/config.json`
 
-## Git Page Docs (este site)
+## Secao global auth
 
-O ficheiro `gitpagedocs/docs/versions/1.0.0/config.json` pode definir:
+Use `auth` no topo do config de versao:
 
-- **`auth.accessKeys`** – chaves nomeadas para desbloquear rotas protegidas da doc.
-- **`authorization`** por rota – `accessKeyId`, `requiredRoles`, `requireExternalAuth`, `allowedProviders`.
+- `accessKeys`: mapa de ids de chave para segredo esperado
+- `rolesStorageKey`: chave de localStorage para bootstrap de papeis
+- `providers`: lista de provedores externos (`authjs`, `clerk`, `firebase`, `jwt`)
 
-Provedores podem incluir **Auth.js**, **Clerk**, **Firebase**, **JWT** (ver `auth.providers` no mesmo ficheiro).
+## Autorizacao por rota
 
-### Exemplo
+Dentro de cada rota (`routes-md`, `routes-html`, `routes-video`):
 
-```json
-"authorization": {
-  "accessKeyId": "docs-key",
-  "requiredRoles": ["maintainer"],
-  "requireExternalAuth": true,
-  "allowedProviders": ["authjs", "jwt"]
-}
-```
+- `authorization.accessKeyId`
+- `authorization.requiredRoles`
+- `authorization.requireExternalAuth`
+- `authorization.allowedProviders`
 
-Use quando precisar de esconder documentação interna ou o **source viewer** atrás de chave ou SSO. Para documentação pública do projeto, deixe rotas sem `authorization` ou distribua chaves só de leitura.
+## Fases
 
-> Versão: 1.0.0
+### Fase A - Chave de acesso
+
+Defina `authorization.accessKeyId` e a chave correspondente em `auth.accessKeys`.
+
+### Fase B - Papeis
+
+Defina `authorization.requiredRoles` com um ou mais papeis.
+
+Os papeis podem vir de:
+
+- query param `?authRoles=admin,maintainer`
+- localStorage (`rolesStorageKey`)
+- claims de provedores externos
+
+### Fase C - Provedores externos
+
+Defina `authorization.requireExternalAuth=true` e opcionalmente `allowedProviders`.
+
+Adaptadores suportados:
+
+- Auth.js (`type: "authjs"`)
+- Clerk (`type: "clerk"`)
+- Firebase Auth (`type: "firebase"`)
+- JWT custom (`type: "jwt"`)
+
+> Versao: 1.0.0

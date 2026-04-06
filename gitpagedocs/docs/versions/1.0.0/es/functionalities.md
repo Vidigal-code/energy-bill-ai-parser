@@ -1,50 +1,68 @@
 # Funcionalidades
 
-Mapa de funcionalidades de **energy-bill-ai-parser** alineado con el código.
+Referencia completa de opciones CLI, claves de configuracion y funciones del runtime.
 
-## Autenticación y usuarios
+## Comandos CLI
 
-- **Registro / login** con hash de contraseña y emisión de JWT.
-- **Refresh token** y **logout**.
-- **Perfil** del usuario actual.
-- **Roles** `ADMIN` y `USER` aplicados en rutas y handlers.
+| Comando | Descripcion |
+|---------|-------------|
+| `npx gitpagedocs` | Genera config y docs en `gitpagedocs/` |
+| `npx gitpagedocs --layoutconfig` | Tambien genera layouts/templates locales |
+| `npx gitpagedocs --home` | Distribucion standalone (`gitpagedocshome/`) |
+| `npx gitpagedocs --push --owner X --repo Y` | Configura workflow, commit, push |
+| `npx gitpagedocs --interactive` / `-i` | Modo interactivo con prompts |
 
-## Facturas y procesamiento de PDF
+## Opciones CLI
 
-- **Subida** de PDFs de facturas (multipart) con validación y metadatos.
-- **Pipeline de extracción** que:
-  - Selecciona el LLM activo según configuración.
-  - Envía el PDF (o representación derivada según el proveedor) al modelo.
-  - Mapea la salida al **contrato de extracción** y persiste resultados.
-- **Dashboards** y listados filtrados por rol.
+| Opcion | Descripcion |
+|--------|-------------|
+| `--owner <user>` | Owner de GitHub |
+| `--repo <repo>` | Repositorio GitHub |
+| `--path <subpath>` | Subruta de docs (ej: `docs`); sin ella, base path = nombre del repo para CSS/JS en project sites |
+| `--output <dir>` | Directorio de salida (default: `gitpagedocs`) |
+| `--search true|false` | Habilita/deshabilita busqueda de repositorio (`--home`) |
+| `--layoutconfig` | Genera `gitpagedocs/layouts/` |
+| `--push` | Crea workflow, commit de artefactos, push |
+| `--home` | Genera `gitpagedocshome/` (estatico + .env + Dockerfile) |
 
-## Módulo LLM
+## Salida generada
 
-- **Multi-proveedor**: Gemini, OpenAI, Claude, Ollama, etc.
-- **Selección dinámica** vía entorno / runtime.
-- **Ollama**: puede convertir páginas del PDF a imágenes cuando la API no acepta PDF (ver `README` en la raíz para `OPEN_SOURCE_IA` y `LLM_PROVIDER`).
+- `gitpagedocs/config.json` – config raiz
+- `gitpagedocs/icon.svg` – icono por defecto
+- `gitpagedocs/docs/versions/<ver>/config.json` – rutas por version
+- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/*.md` – docs en markdown
+- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/source-viewer` – visor de codigo (estilo GitHub)
+- `gitpagedocs/layouts/` – solo con `--layoutconfig`
 
-## Almacenamiento y cifrado
+## Tipos de contenido
 
-- **JWE** para cargas sensibles antes del almacenamiento cuando aplique.
-- **S3-compatible**; **LocalStack** en Docker local.
+| Tipo | Clave config | Descripcion |
+|------|--------------|-------------|
+| Markdown | `routes-md` | Archivos .md con `path` por idioma |
+| HTML | `routes-html` | `path` (ej: source-viewer) o `url` externa |
+| Video | `routes-video` | `video.pathVideo`, `video.videoType` |
+| Audio | `routes-audio` | `audio.pathAudio`, `audio.audioType` |
 
-## Administración
+## Visor de codigo fuente
 
-- APIs **admin** para usuarios, documentos, facturas y visibilidad de auditoría (según implementación).
-- **RBAC** para acciones solo `ADMIN`.
+La CLI genera una pagina **Codigo fuente** por version. Escanea `src/`, `cli/` y archivos raiz (README.md, package.json, next.config.ts, etc.) y construye un visor estilo GitHub en modo oscuro con:
 
-## Auditoría
+- Arbol de archivos en barra lateral con expandir/colapsar carpetas
+- Filtro de busqueda
+- Resaltado de sintaxis (TypeScript, JavaScript, JSON, CSS, Markdown)
+- Boton copiar, numeros de linea
+- Alternar vista previa/codigo del README.md
+- Controles Expandir todo / Colapsar todo
 
-- Registros de **auditoría** para acciones relevantes (según configuración).
+## Claves de config (site)
 
-## API y documentación
+- `name`, `defaultLanguage`, `supportedLanguages`
+- `docsVersion`, `rendering`, `ThemeDefault`, `ThemeModeDefault`
+- `ProjectLink`, `layoutsConfigPathOficial`, `layoutsConfigPath`
 
-- **Swagger** (`/api/docs/pt`, `/api/docs/en`).
-- **Health** para orquestación y uptime.
+## Variables de entorno
 
-## Documentación estática (este sitio)
+- `GITPAGEDOCS_REPOSITORY_SEARCH` – busqueda de repositorio (local)
+- `GITHUB_ACTIONS` – modo build GitHub Pages
 
-- Páginas **Markdown**, rutas **HTML** (visor de código) y **vídeo** con la ejecución del proyecto.
-
-> Versión: 1.0.0
+> Version (ES): 1.0.0
