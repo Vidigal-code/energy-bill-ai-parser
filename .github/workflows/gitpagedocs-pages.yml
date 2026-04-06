@@ -59,10 +59,9 @@ jobs:
           GITPAGEDOCS_PATH: "git-docs"
 
       - name: Relocate output to custom docs path
-        if: ${{ env.GITPAGEDOCS_PATH != '' }}
         run: |
-          mkdir -p .gitpagedocs-runtime/out_new/${{ env.GITPAGEDOCS_PATH }}
-          mv .gitpagedocs-runtime/out/* .gitpagedocs-runtime/out_new/${{ env.GITPAGEDOCS_PATH }}/
+          mkdir -p .gitpagedocs-runtime/out_new/git-docs
+          mv .gitpagedocs-runtime/out/* .gitpagedocs-runtime/out_new/git-docs/
           rm -rf .gitpagedocs-runtime/out
           mv .gitpagedocs-runtime/out_new .gitpagedocs-runtime/out
 
