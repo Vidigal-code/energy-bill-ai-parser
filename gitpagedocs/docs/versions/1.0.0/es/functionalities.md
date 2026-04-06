@@ -1,68 +1,50 @@
 # Funcionalidades
 
-Referencia completa de opciones CLI, claves de configuracion y funciones del runtime.
+Mapa de funcionalidades de **energy-bill-ai-parser** alineado con el código.
 
-## Comandos CLI
+## Autenticación y usuarios
 
-| Comando | Descripcion |
-|---------|-------------|
-| `npx gitpagedocs` | Genera config y docs en `gitpagedocs/` |
-| `npx gitpagedocs --layoutconfig` | Tambien genera layouts/templates locales |
-| `npx gitpagedocs --home` | Distribucion standalone (`gitpagedocshome/`) |
-| `npx gitpagedocs --push --owner X --repo Y` | Configura workflow, commit, push |
-| `npx gitpagedocs --interactive` / `-i` | Modo interactivo con prompts |
+- **Registro / login** con hash de contraseña y emisión de JWT.
+- **Refresh token** y **logout**.
+- **Perfil** del usuario actual.
+- **Roles** `ADMIN` y `USER` aplicados en rutas y handlers.
 
-## Opciones CLI
+## Facturas y procesamiento de PDF
 
-| Opcion | Descripcion |
-|--------|-------------|
-| `--owner <user>` | Owner de GitHub |
-| `--repo <repo>` | Repositorio GitHub |
-| `--path <subpath>` | Subruta de docs (ej: `docs`); sin ella, base path = nombre del repo para CSS/JS en project sites |
-| `--output <dir>` | Directorio de salida (default: `gitpagedocs`) |
-| `--search true|false` | Habilita/deshabilita busqueda de repositorio (`--home`) |
-| `--layoutconfig` | Genera `gitpagedocs/layouts/` |
-| `--push` | Crea workflow, commit de artefactos, push |
-| `--home` | Genera `gitpagedocshome/` (estatico + .env + Dockerfile) |
+- **Subida** de PDFs de facturas (multipart) con validación y metadatos.
+- **Pipeline de extracción** que:
+  - Selecciona el LLM activo según configuración.
+  - Envía el PDF (o representación derivada según el proveedor) al modelo.
+  - Mapea la salida al **contrato de extracción** y persiste resultados.
+- **Dashboards** y listados filtrados por rol.
 
-## Salida generada
+## Módulo LLM
 
-- `gitpagedocs/config.json` – config raiz
-- `gitpagedocs/icon.svg` – icono por defecto
-- `gitpagedocs/docs/versions/<ver>/config.json` – rutas por version
-- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/*.md` – docs en markdown
-- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/source-viewer` – visor de codigo (estilo GitHub)
-- `gitpagedocs/layouts/` – solo con `--layoutconfig`
+- **Multi-proveedor**: Gemini, OpenAI, Claude, Ollama, etc.
+- **Selección dinámica** vía entorno / runtime.
+- **Ollama**: puede convertir páginas del PDF a imágenes cuando la API no acepta PDF (ver `README` en la raíz para `OPEN_SOURCE_IA` y `LLM_PROVIDER`).
 
-## Tipos de contenido
+## Almacenamiento y cifrado
 
-| Tipo | Clave config | Descripcion |
-|------|--------------|-------------|
-| Markdown | `routes-md` | Archivos .md con `path` por idioma |
-| HTML | `routes-html` | `path` (ej: source-viewer) o `url` externa |
-| Video | `routes-video` | `video.pathVideo`, `video.videoType` |
-| Audio | `routes-audio` | `audio.pathAudio`, `audio.audioType` |
+- **JWE** para cargas sensibles antes del almacenamiento cuando aplique.
+- **S3-compatible**; **LocalStack** en Docker local.
 
-## Visor de codigo fuente
+## Administración
 
-La CLI genera una pagina **Codigo fuente** por version. Escanea `src/`, `cli/` y archivos raiz (README.md, package.json, next.config.ts, etc.) y construye un visor estilo GitHub en modo oscuro con:
+- APIs **admin** para usuarios, documentos, facturas y visibilidad de auditoría (según implementación).
+- **RBAC** para acciones solo `ADMIN`.
 
-- Arbol de archivos en barra lateral con expandir/colapsar carpetas
-- Filtro de busqueda
-- Resaltado de sintaxis (TypeScript, JavaScript, JSON, CSS, Markdown)
-- Boton copiar, numeros de linea
-- Alternar vista previa/codigo del README.md
-- Controles Expandir todo / Colapsar todo
+## Auditoría
 
-## Claves de config (site)
+- Registros de **auditoría** para acciones relevantes (según configuración).
 
-- `name`, `defaultLanguage`, `supportedLanguages`
-- `docsVersion`, `rendering`, `ThemeDefault`, `ThemeModeDefault`
-- `ProjectLink`, `layoutsConfigPathOficial`, `layoutsConfigPath`
+## API y documentación
 
-## Variables de entorno
+- **Swagger** (`/api/docs/pt`, `/api/docs/en`).
+- **Health** para orquestación y uptime.
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH` – busqueda de repositorio (local)
-- `GITHUB_ACTIONS` – modo build GitHub Pages
+## Documentación estática (este sitio)
 
-> Version (ES): 1.0.0
+- Páginas **Markdown**, rutas **HTML** (visor de código) y **vídeo** con la ejecución del proyecto.
+
+> Versión: 1.0.0
