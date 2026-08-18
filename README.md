@@ -1,3 +1,4 @@
+
 # Energy Bill AI Parser
 
 Plataforma full-stack para processamento de faturas de energia com IA, autenticação segura, RBAC, auditoria e armazenamento criptografado.
