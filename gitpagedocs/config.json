@@ -126,6 +126,7 @@
     "audioSequentialPlayback": false,
     "audioPopoverHideSource": false,
     "audioPopoverShowMinutes": true,
+    "mediaExclusivePlayback": true,
     "audioTracks": [
       {
         "url": "https://www.youtube.com/watch?v=xAR6N9N8e6U",
