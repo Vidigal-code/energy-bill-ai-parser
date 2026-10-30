@@ -1,19 +1,29 @@
-# Integración LLM y Extracción de Datos
+# Integración LLM
 
-El pilar estructural de "Parseo" o Smart OCR de esta plataforma excluye usar algoritmos matemáticos caóticos para el reconocimiento óptico; entabla charlas lógicas directas a Servidores GenAI mediante Modelos modales Visuales analizando la factura pixel a pixel buscando data determinística.
+Recibe facturas eléctricas PDF, extrae campos mediante un proveedor multimodal, calcula indicadores y ofrece listas, dashboards, documentos y administración. Compare resultados con el PDF; validar el esquema no demuestra que los valores se hayan leído correctamente.
 
-## Proveedor Principal (Google Gemini)
+## Flujo y casos de fallo
 
-Escogimos la **API oficial de Gemini**. Más allá de ser rápida y eficiente, es el único ecosistema en la nube con un peso imbatible en aceptar MIME types directos bajo el formato estricto `application/pdf`. Esto remueve al 100% tareas tediosas del lado de Node.JS de alterar bytes. El PDF se empuja puro como es.
+1. Login/registro → tokens de acceso/refresh → JwtAuthGuard/RolesGuard. USER consulta sus datos por uploaderUserId; ADMIN tiene consultas administrativas. RefreshToken guarda hash, jti, caducidad, revocación y sustitución; refresh no es stateless. El inventario de controllers enumera rutas reales.
 
-### Flujo Completo:
-1. NestJS levanta el Buffer del documento resguardado.
-2. Encadena la consulta con el **Prompt de Formato JSON estricto**, aislado como variable privada del Backend.
-3. Se invoca al SDK oficial Multimodal, la capa de Google absorbe el PDF, analiza la grilla visual, y arroja la respuesta financiera.
-4. El backend decodifica con Regex las cadenas, rehidrata los Tipos Mapeados y los deposita vía Prisma.
+2. POST /api/invoices/extract recibe multipart file. Archivo ausente: 400; MIME distinto de application/pdf: 415; tamaño superior a PDF_MAX_FILE_SIZE_MB: 413. El archivo se cifra como JWE y sube a S3 antes de extraer. Comprobar MIME no equivale a inspeccionar todo el contenido.
 
-## Alternativa Desconectada Open-Source (Ollama)
-Si el software requiere escalar en un data-center cerrado (offline). Un mecanismo de diseño *Factory* detectará `Ollama` desde el archivo global `.env`. Como LLMs locales basados en Llama no tragan PDF gigantes directamente sin errores visuales, el ecosistema internamente abstrae la página principal de la factura, la mapea a imagen PNG limpia y se las pasa con la orden a la inteligencia local logrando resultados similares con nula conexión web.
+3. OPEN_SOURCE_IA=true selecciona Ollama; en otro caso LLM_PROVIDER elige openai (predeterminado), gemini/google o claude. Usa adaptadores HTTP, no requiere SDK Gemini. Proveedores validan un contrato común; Ollama convierte PDF a imagen. Modelo/endpoint vienen de configuración. ROLLBACK_ON_INVOICE_FAILURE se lee/registra pero no desactiva la limpieza S3 del caso de uso actual.
 
-## Contratos Blindados
-El estándar escrito en `backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts` amarra a cualquier modelo de IA existente a obedecer el estándar. Extraer y colocar los valores bajo llaves obligatorias para alimentar la base de PostgreSQL de forma monolítica, impidiendo corrupción estructural.
+4. Extracción válida → cálculo → transacción Prisma guarda Invoice SUCCESS, InvoiceMetrics y StoredDocument → AuditLog SUCCESS → respuesta con invoiceId, documentId, extraction y metrics. Consumo suma kWh eléctricos y SCEEE; compensada usa GD I; totalSinGD suma electricidad, SCEEE e iluminación; ahorro usa el valor GD I. No convierte automáticamente el ahorro a valor absoluto.
+
+5. Un fallo dentro de extracción/persistencia intenta eliminar S3, audita error y propaga excepción. Fallo al eliminar registra warning. El upload inicial ocurre antes del bloque; fallo de auditoría después del commit puede dejar registros sin objeto. Existen enums PROCESSING/ERROR, pero no se crea una factura por cada intento fallido.
+
+## Archivos relacionados
+
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
+
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

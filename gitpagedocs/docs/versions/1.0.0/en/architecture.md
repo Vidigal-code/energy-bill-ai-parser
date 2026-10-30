@@ -1,32 +1,37 @@
 # System Architecture and Flow
 
-The **Energy Bill AI Parser** Platform is built using a logical microservices-style architecture, clearly split between a **Frontend** and a **Backend**, connected via RESTful APIs.
+Accepts energy-bill PDFs, extracts structured fields through a multimodal provider, calculates metrics and exposes listings, dashboards, documents and administration. Compare results with the original PDF; schema validation does not prove that values were read correctly.
 
-## Main Components
+## Implemented behavior
 
-1. **Frontend (Next.js + FSD):**
-   - Handles the user interface, administrative panels, and dashboards.
-   - Connects to the Backend through Axios.
-   - Built with the *Feature-Sliced Design* (FSD) architecture paradigm.
+TypeScript/NestJS 11 with Prisma 6.4/PostgreSQL, Passport/JWT, Argon2, Zod, S3 and JWE; Next.js 16.1.6/React 19.2.3 frontend with Redux Toolkit and TanStack Query. auth, invoices, llm, storage, audit, admin and health separate presentation, application and contracts. The use case depends on ILlmExtractor and DocumentStoragePort. Processing is synchronous within the request; this flow has no extraction queue.
 
-2. **Backend (NestJS):**
-   - The heart of the business logic.
-   - Manages file uploads, AI-driven extraction, and orchestration.
-   - Handles strict RBAC management and Auditing.
+```mermaid
+sequenceDiagram
+  participant UI as Frontend
+  participant API as Extraction use case
+  participant S3 as Encrypted storage
+  participant LLM as Selected provider
+  participant DB as PostgreSQL
+  UI->>API: Multipart PDF and authentication
+  API->>S3: Upload JWE
+  API->>LLM: Original PDF or images
+  LLM-->>API: Validated extraction
+  API->>DB: Transaction: invoice, metrics, document
+  API->>DB: Audit
+  API-->>UI: IDs, extraction, metrics
+```
 
-3. **Relational Database (PostgreSQL):**
-   - Orchestrated via Prisma ORM to save Users, Invoices, Metrics, Audit Logs, and system mappings.
+## Related files
 
-4. **AI Engine (LLMs):**
-   - Core mechanism that reads PDFs or binary images and outputs structured JSON containing keys and metrics. Google Gemini is the multimodal primary provider; Ollama serves as a local, offline fallback.
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-5. **S3 File Storage (AWS S3 / LocalStack):**
-   - Invoices are securely pushed to a bucket, shielded with JWE (JSON Web Encryption) before leaving the application boundaries.
+## Navigation
 
-## Flow Diagram (Invoice Upload Example)
-
-1. User (`ADMIN` or `USER`) accesses the Frontend and uploads the energy bill PDF.
-2. The file reaches the NestJS Backend. It is JWE-encrypted and forwarded to an **S3 Bucket** for safekeeping.
-3. Simultaneously, the raw PDF is pushed to the **Gemini API** where multimodal vision capabilities process its visual structure.
-4. The LLM extracts the nested metrics. The Backend intercepts the JSON result, performs deterministic calculations, and persists the data using **Prisma/PostgreSQL**.
-5. Audit events are recorded permanently, logging who uploaded it, timestamps, and log IDs.
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

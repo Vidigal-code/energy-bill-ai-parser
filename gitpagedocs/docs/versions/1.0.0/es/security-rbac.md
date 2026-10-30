@@ -1,21 +1,27 @@
-# Seguridad y Gestión de Acceso (RBAC)
+# Seguridad y RBAC
 
-La filosofía base de la suite **Energy Bill AI Parser** es "Prohibir por Padrón" (Default Deny), aplicando robustez inquebrantable a través de identificaciones asimétricas de JWT.
+Recibe facturas eléctricas PDF, extrae campos mediante un proveedor multimodal, calcula indicadores y ofrece listas, dashboards, documentos y administración. Compare resultados con el PDF; validar el esquema no demuestra que los valores se hayan leído correctamente.
 
-## Barricadas vía Guards en NestJS
-La capa global de módulos está custodiada firmemente por el `JwtAuthGuard`. Nadie consume ningún endpoint comercial. Exclusivamente se levanta el escudo si los endpoints poseen la meta-anotación `@Public()`, la cual se aplica a zonas de registro o validación local de credenciales.
+## Contratos de datos
 
-## Sistema RBAC Estricto (Role-Based Access Control)
-Una vez validados, no significa poder absoluto. El nivel subyacente jerarquiza la vista:
-- **Cuentas `USER`**:
-  - Almacenan sus facturas y el identificador amarra la métrica visualmente a una caja blindada (Aislamiento de inquilino o Tenant-Isolation).
-  - Listan resúmenes generados estrictamente por ellos.
-- **Cuentas `ADMIN`**:
-  - Dotadas del escudo para escanear `api/admin/users` manipulando y auditando.
-  - Miran los rastros del todo el ecosistema (AuditLogs).
+Invoice vincula uploader, campos Decimal/JSON y métricas; StoredDocument guarda bucket/clave, checksum, tamaño y factura opcional; AuditLog guarda actor/acción/estado. Consultas filtran usuario/rol. Proteja claves LLM/cifrado y respalde las de cifrado. Cifrar S3 no impide enviar el PDF original al proveedor seleccionado. Backend determina autorización/valores.
 
-### Componente Lógico Decorador de Roles
-El decorador `@Roles(Role.ADMIN)` acoplado al `RolesGuard` escanea la sesión JWT destilada y asegura limpiamente que poseas la llave administrativa necesaria emitiendo bloqueos tajantes 403 (Forbidden) al infractor.
+## Flujo y casos de fallo
 
-## Encriptación JWE sobre la Web (JSON Web Encryption)
-Jamás subimos a AWS S3 (o LocalStack) datos libres legibles. Se recurre a algoritmos RSA usando el módulo Node-Jose para envolver las llaves de AWS S3 generadas por nuestra arquitectura. Una extracción forzosa del bucket sólo generaría datos nulos protegidos con grado militar.
+Login/registro → tokens de acceso/refresh → JwtAuthGuard/RolesGuard. USER consulta sus datos por uploaderUserId; ADMIN tiene consultas administrativas. RefreshToken guarda hash, jti, caducidad, revocación y sustitución; refresh no es stateless. El inventario de controllers enumera rutas reales.
+
+Copie envexample.txt a .env; configure DATABASE_URL, proveedor/modelo/clave, S3 y cifrado. Compose inicia PostgreSQL, LocalStack y aplicaciones; Ollama opcional está comentado y no inicia automáticamente. Requiere dependencias de rasterización del Dockerfile y modelo de visión. Backend tiene test:unit/test:integration, lint/build; frontend lint/build. Ante 503 revise proveedor/clave; PDF rechazado formato/tamaño; dashboard vacío usuario/filtros/persistencia. Rutas reales incluyen dashboard/consolidated, energy, financial y my-documents.
+
+## Archivos relacionados
+
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
+
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

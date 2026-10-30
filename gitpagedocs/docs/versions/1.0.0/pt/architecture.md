@@ -1,32 +1,37 @@
 # Arquitetura e Fluxo do Sistema
 
-A Plataforma **Energy Bill AI Parser** foi projetada usando uma arquitetura baseada em microsserviços lógicos divididos entre um **Frontend** e um **Backend**, conectados através de APIs RESTFul. 
+Recebe faturas de energia em PDF, extrai campos estruturados por um provedor multimodal, calcula indicadores e oferece listagem, dashboards, documentos e administração. O resultado deve ser conferido contra o PDF original; validação de esquema não garante que os números foram lidos corretamente.
 
-## Componentes Principais
+## Comportamento implementado
 
-1. **Frontend (Next.js + FSD):** 
-   - Gerencia a interface, painéis administrativos e dashboards.
-   - Comunicação via Axios com o Backend.
-   - Padrão arquitetural *Feature-Sliced Design* (FSD).
+TypeScript/NestJS 11 com Prisma 6.4/PostgreSQL, Passport/JWT, Argon2, Zod, S3 e JWE; frontend Next.js 16.1.6/React 19.2.3 com Redux Toolkit e TanStack Query. Módulos auth, invoices, llm, storage, audit, admin e health separam apresentação, aplicação e contratos. O caso de uso depende de ILlmExtractor e DocumentStoragePort. O processamento é síncrono na requisição; não há fila de extração neste fluxo.
 
-2. **Backend (NestJS):**
-   - Coração do processamento e regras de negócio.
-   - Controla o upload e a extração inteligente via LLMs.
-   - Gestão RBAC e Auditoria centralizada.
+```mermaid
+sequenceDiagram
+  participant UI as Frontend
+  participant API as Extraction use case
+  participant S3 as Encrypted storage
+  participant LLM as Selected provider
+  participant DB as PostgreSQL
+  UI->>API: Multipart PDF and authentication
+  API->>S3: Upload JWE
+  API->>LLM: Original PDF or images
+  LLM-->>API: Validated extraction
+  API->>DB: Transaction: invoice, metrics, document
+  API->>DB: Audit
+  API-->>UI: IDs, extraction, metrics
+```
 
-3. **Banco de Dados Relacional (PostgreSQL):**
-   - Orquestrado via Prisma ORM para salvar Usuários, Perfis, Faturas, Métricas, Logs de auditoria e configurações.
+## Arquivos relacionados
 
-4. **Motor de IA (LLMs):**
-   - O núcleo do sistema, enviando PDFs parseados ou binários de imagem para obter chaves e valores na extração. Gemini API é o motor primário multimodal; Ollama para ambientes offline e fallback.
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-5. **Armazenamento de Arquivos S3 (AWS S3 / LocalStack):**
-   - Armazena todas as faturas convertidas em um bucket, encriptadas através de JWE (JSON Web Encryption) para máxima segurança na nuvem.
+## Navegação
 
-## Diagrama de Fluxo (Exemplo do Upload de Fatura)
-
-1. Usuário (`ADMIN` ou `USER`) acessa o Frontend e realiza upload do PDF da conta de luz.
-2. O arquivo vai para o Backend (NestJS). O backend assina o arquivo com JWE e salva no **Bucket S3**.
-3. Em paralelo, o arquivo PDF é enviado direto para a **Gemini API** para processamento visual do documento (Vision).
-4. O LLM extrai métricas financeiras (Consumo, Compensação GDI, Iluminação). O Backend intercepta, consolida os cálculos, e salva os resultados utilizando **Prisma/PostgreSQL**.
-5. Eventos de auditoria são criados (quem enviou, quando, qual arquivo, e o ID de log).
+- [Project guide](?menu=pt&lang=pt&id=19)
+- [Source reference](?menu=pt&lang=pt&id=20)

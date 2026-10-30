@@ -1,29 +1,85 @@
-# Environment Variables & Configuration
+# Environment Variables
 
-The application is heavily bound to the global `.env` file located exclusively on the project root. It dictates all architectural configurations.
+Accepts energy-bill PDFs, extracts structured fields through a multimodal provider, calculates metrics and exposes listings, dashboards, documents and administration. Compare results with the original PDF; schema validation does not prove that values were read correctly.
 
-## Primary Keys
+## Configuration and deployment
 
-### Backend Settings
-`PORT=3000`
-`NODE_ENV=development`
-`JWT_SECRET=super_secret_for_jwt`
+Copy envexample.txt to .env; configure DATABASE_URL, provider/model, its key, S3 and encryption. Compose starts PostgreSQL, LocalStack, backend/frontend; optional Ollama configuration is commented out, so do not assume it starts. Ollama needs Dockerfile rasterization dependencies and a vision model. Backend has test:unit/test:integration, lint/build; frontend has lint/build. For 503 check provider/key; for rejected PDFs check format/size; for empty dashboards check user/filters/persistence. Actual endpoints include dashboard/consolidated, energy, financial and my-documents.
 
-### Database
-`DATABASE_URL="postgresql://user:password@postgres:5432/energy_db?schema=public"`
+## Execution commands
 
-### JWE Encryption Keys
-`JWE_PRIVATE_KEY` and `JWE_PUBLIC_KEY`: Should contain valid Base64-encoded RSA strings. The backend will halt boot operations to protect Invoices if these are invalid.
+```sh
+docker compose up --build
+# Validation in a separately configured test environment
+npm --prefix backend ci
+npm --prefix backend run test:unit
+npm --prefix backend run test:integration
+npm --prefix backend run build
+npm --prefix frontend ci
+npm --prefix frontend run build
+```
 
-### LLMs and AI Engine
-- `OPEN_SOURCE_IA=false` (Setting to true boots Ollama and unlinks Gemini)
-- `LLM_PROVIDER=gemini` (gemini | ollama)
-- `GEMINI_API_KEY=""`
-- `OLLAMA_NODE_URL="http://ollama:11434"`
+Names are extracted only from example files and environment references in source. Configure values locally; private credentials are excluded. NEXT_PUBLIC_ and VITE_ variables are public in the browser.
 
-### AWS S3 / LocalStack Mock
-- `AWS_REGION=us-east-1`
-- `AWS_ACCESS_KEY_ID="test"`
-- `AWS_SECRET_ACCESS_KEY="test"`
-- `AWS_S3_BUCKET_NAME="invoices-bucket"`
-- `AWS_ENDPOINT="http://localstack:4566"` (Forces S3 traffic towards the local containerized LocalStack environment rather than Amazon's paid cloud).
+| Variable | Source |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `ANTHROPIC_BASE_URL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `ANTHROPIC_MODEL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `BACKEND_API_URL` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt), [frontend/src/shared/config/server-env.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/frontend/src/shared/config/server-env.ts) |
+| `DATABASE_URL` | [backend/src/shared/prisma/prisma.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/shared/prisma/prisma.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `DEFAULT_ADMIN_EMAIL` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `DEFAULT_ADMIN_PASSWORD` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `DEFAULT_ADMIN_USERNAME` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `FRONTEND_PORT` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `GEMINI_API_KEY` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `GEMINI_BASE_URL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `GEMINI_MODEL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `HELMET_ENABLED` | [backend/src/main.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/main.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `INVOICE_EXTRACTION_CONTEXT` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts) |
+| `INVOICE_EXTRACTION_PROMPT` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts) |
+| `INVOICE_EXTRACTION_REFERENCE` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts) |
+| `JWE_SECRET` | [backend/src/modules/storage/application/file-crypto.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/application/file-crypto.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `JWT_ACCESS_EXPIRES_IN` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `JWT_ACCESS_SECRET` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [backend/src/modules/auth/auth.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/auth.module.ts), [backend/src/modules/auth/infrastructure/jwt.strategy.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/infrastructure/jwt.strategy.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `JWT_ISSUER` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `JWT_REFRESH_EXPIRES_IN` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `JWT_REFRESH_SECRET` | [backend/src/modules/auth/application/auth.service.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/auth/application/auth.service.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `LLM_PROVIDER` | [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts), [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `LOGS` | [backend/src/shared/logging/api-logger.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/shared/logging/api-logger.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `NEXT_PUBLIC_BACKEND_API_URL` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt), [frontend/src/shared/config/server-env.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/frontend/src/shared/config/server-env.ts) |
+| `NODE_ENV` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt), [frontend/src/shared/api/server-auth.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/frontend/src/shared/api/server-auth.ts) |
+| `OLLAMA_BASE_URL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `OLLAMA_MODEL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `OPENAI_API_KEY` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `OPENAI_BASE_URL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `OPENAI_MODEL` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `OPEN_SOURCE_IA` | [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts), [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `PDF_MAX_FILE_SIZE_MB` | [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts), [backend/src/modules/invoices/invoices.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/invoices.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `PORT` | [backend/src/main.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/main.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `RATE_LIMIT_LIMIT` | [backend/src/app.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/app.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `RATE_LIMIT_TTL_MS` | [backend/src/app.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/app.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `ROLLBACK_ON_INVOICE_FAILURE` | [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `S3_ACCESS_KEY_ID` | [backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `S3_BUCKET` | [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts), [backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `S3_ENDPOINT` | [backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `S3_FORCE_PATH_STYLE` | [backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `S3_REGION` | [backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `S3_SECRET_ACCESS_KEY` | [backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/storage/infrastructure/s3-document-storage.adapter.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `STORAGE_DRIVER` | [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `SWAGGER_ENABLED` | [backend/src/main.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/main.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+| `SWAGGER_PATH` | [backend/src/main.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/main.ts), [envexample.txt](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/envexample.txt) |
+
+## Related files
+
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
+
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

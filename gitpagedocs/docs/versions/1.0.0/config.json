@@ -49,6 +49,34 @@
   },
   "routes-md": [
     {
+      "id": 19,
+      "title": {
+        "pt": "Contexto e fluxos do projeto",
+        "en": "Project context and workflows",
+        "es": "Contexto y flujos del proyecto"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
+      "id": 20,
+      "title": {
+        "pt": "Referência do código",
+        "en": "Source reference",
+        "es": "Referencia del código"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
       "id": 1,
       "title": {
         "pt": "Primeiros passos",
@@ -56,9 +84,9 @@
         "es": "Primeros pasos"
       },
       "description": {
-        "pt": "Ambiente, .env, Docker Compose e URLs da API e do frontend",
-        "en": "Environment, .env, Docker Compose, API and frontend URLs",
-        "es": "Entorno, .env, Docker Compose, URLs de API y frontend"
+        "pt": "Primeiros passos",
+        "en": "Getting Started",
+        "es": "Primeros pasos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -93,9 +121,9 @@
         "es": "Visión general del proyecto"
       },
       "description": {
-        "pt": "Stack, módulos NestJS/Next.js e fluxo da aplicação",
-        "en": "Stack, NestJS/Next.js modules and application flow",
-        "es": "Stack, módulos NestJS/Next.js y flujo de la aplicación"
+        "pt": "Visão geral do projeto",
+        "en": "Project overview",
+        "es": "Visión general del proyecto"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -130,9 +158,9 @@
         "es": "Funcionalidades"
       },
       "description": {
-        "pt": "Autenticação, faturas, LLM, armazenamento, admin e API",
-        "en": "Authentication, invoices, LLM, storage, admin and API",
-        "es": "Autenticación, facturas, LLM, almacenamiento, admin y API"
+        "pt": "Funcionalidades",
+        "en": "Functionalities",
+        "es": "Funcionalidades"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -167,9 +195,9 @@
         "es": "Entrega y evidencias"
       },
       "description": {
-        "pt": "Checklist de validação e uso de Issues/Projects no repositório",
-        "en": "Validation checklist and using Issues/Projects in this repo",
-        "es": "Lista de validación e Issues/Projects en el repositorio"
+        "pt": "Entrega e evidências",
+        "en": "Delivery and evidence",
+        "es": "Entrega y evidencias"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -204,9 +232,9 @@
         "es": "Arquitectura e infraestructura"
       },
       "description": {
-        "pt": "Módulos backend/frontend, Docker, LLM e segurança",
-        "en": "Backend/frontend modules, Docker, LLM and security",
-        "es": "Módulos backend/frontend, Docker, LLM y seguridad"
+        "pt": "Arquitetura e infraestrutura",
+        "en": "Architecture and infrastructure",
+        "es": "Arquitectura e infraestructura"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -241,9 +269,9 @@
         "es": "Rutas autorizadas"
       },
       "description": {
-        "pt": "Controle acesso por chave, roles e provedores externos",
-        "en": "Control access by key, roles and external providers",
-        "es": "Controla acceso por clave, roles y proveedores externos"
+        "pt": "Rotas autorizadas",
+        "en": "Authorized routes",
+        "es": "Rutas autorizadas"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -291,9 +319,9 @@
         "es": "Arquitectura y Flujo del Sistema"
       },
       "description": {
-        "pt": "Flow da Plataforma e Integração",
-        "en": "Platform Flow and Integration",
-        "es": "Flujo de Plataforma"
+        "pt": "Arquitetura e Fluxo do Sistema",
+        "en": "System Architecture and Flow",
+        "es": "Arquitectura y Flujo del Sistema"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -328,9 +356,9 @@
         "es": "Stack Tecnológico"
       },
       "description": {
-        "pt": "Ferramentas Utilizadas",
-        "en": "Used Tools",
-        "es": "Herramientas Utilizadas"
+        "pt": "Stack Tecnológica",
+        "en": "Technology Stack",
+        "es": "Stack Tecnológico"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -365,9 +393,9 @@
         "es": "Visión General del Backend"
       },
       "description": {
-        "pt": "Módulos NestJS",
-        "en": "NestJS Modules",
-        "es": "Módulos NestJS"
+        "pt": "Visão Geral do Backend",
+        "en": "Backend Overview",
+        "es": "Visión General del Backend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -402,9 +430,9 @@
         "es": "Esquema de Base de Datos"
       },
       "description": {
-        "pt": "Prisma Relacional",
-        "en": "Relational Prisma",
-        "es": "Prisma Relacional"
+        "pt": "Esquema de Banco de Dados",
+        "en": "Database Schema",
+        "es": "Esquema de Base de Datos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -439,9 +467,9 @@
         "es": "API Endpoints"
       },
       "description": {
-        "pt": "Swagger e Rotas",
-        "en": "Swagger and Routes",
-        "es": "Swagger y Rutas"
+        "pt": "API Endpoints",
+        "en": "API Endpoints",
+        "es": "API Endpoints"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -476,9 +504,9 @@
         "es": "Arquitectura del Frontend"
       },
       "description": {
-        "pt": "App Router Next.js",
-        "en": "Next.js App Router",
-        "es": "App Router Next.js"
+        "pt": "Arquitetura do Frontend",
+        "en": "Frontend Architecture",
+        "es": "Arquitectura del Frontend"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -513,9 +541,9 @@
         "es": "Gestión del Estado"
       },
       "description": {
-        "pt": "Redux Query e Contexto",
-        "en": "Redux Query and Context",
-        "es": "Redux Query y Contexto"
+        "pt": "Gerenciamento de Estado",
+        "en": "State Management",
+        "es": "Gestión del Estado"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -550,9 +578,9 @@
         "es": "Integración LLM"
       },
       "description": {
-        "pt": "Gemini, Ollama",
-        "en": "Gemini, Ollama",
-        "es": "Gemini, Ollama"
+        "pt": "Integração LLM e Extração",
+        "en": "LLM Integration",
+        "es": "Integración LLM"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -587,9 +615,9 @@
         "es": "Seguridad y RBAC"
       },
       "description": {
-        "pt": "JWT Tokens",
-        "en": "JWT Tokens",
-        "es": "JWT Tokens"
+        "pt": "Segurança e RBAC",
+        "en": "Security and RBAC",
+        "es": "Seguridad y RBAC"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -624,9 +652,9 @@
         "es": "Variables de Entorno"
       },
       "description": {
-        "pt": "Configurações Globais",
-        "en": "Global Configs",
-        "es": "Configuración Global"
+        "pt": "Variáveis de Ambiente",
+        "en": "Environment Variables",
+        "es": "Variables de Entorno"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -661,9 +689,9 @@
         "es": "Despliegue"
       },
       "description": {
-        "pt": "Produção AWS / Vercel",
-        "en": "AWS / Vercel Production",
-        "es": "Producción AWS / Vercel"
+        "pt": "Deployment",
+        "en": "Deployment Strategy",
+        "es": "Despliegue"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -698,9 +726,9 @@
         "es": "Configuración Docker"
       },
       "description": {
-        "pt": "Conteinerização local",
-        "en": "Local containers",
-        "es": "Contenedores locales"
+        "pt": "Configuração Docker",
+        "en": "Docker Setup",
+        "es": "Configuración Docker"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -772,6 +800,36 @@
     }
   ],
   "menus-header-md": [
+    {
+      "id": 19,
+      "pt": {
+        "title": "Contexto e fluxos do projeto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md"
+      },
+      "en": {
+        "title": "Project context and workflows",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md"
+      },
+      "es": {
+        "title": "Contexto y flujos del proyecto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      }
+    },
+    {
+      "id": 20,
+      "pt": {
+        "title": "Referência do código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md"
+      },
+      "en": {
+        "title": "Source reference",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md"
+      },
+      "es": {
+        "title": "Referencia del código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      }
+    },
     {
       "id": 1,
       "pt": {

@@ -1,37 +1,29 @@
 # Entrega y evidencias
 
-Usa **Issues** y **Projects** en GitHub para el trabajo en **energy-bill-ai-parser** y adjunta evidencias para revisores.
+Recibe facturas eléctricas PDF, extrae campos mediante un proveedor multimodal, calcula indicadores y ofrece listas, dashboards, documentos y administración. Compare resultados con el PDF; validar el esquema no demuestra que los valores se hayan leído correctamente.
 
-## Issues sugeridas
+## Flujo y casos de fallo
 
-- **Bug**: discrepancia de extracción con un PDF; adjunta PDF (si se permite) y logs redactados.
-- **Feature**: nuevo proveedor o campo en el dashboard; enlaza al contrato o cambio de API.
-- **Chore**: dependencias, Docker, CI.
+1. Login/registro → tokens de acceso/refresh → JwtAuthGuard/RolesGuard. USER consulta sus datos por uploaderUserId; ADMIN tiene consultas administrativas. RefreshToken guarda hash, jti, caducidad, revocación y sustitución; refresh no es stateless. El inventario de controllers enumera rutas reales.
 
-Etiquetas como `backend`, `frontend`, `llm`, `infra` ayudan a filtrar el backlog.
+2. POST /api/invoices/extract recibe multipart file. Archivo ausente: 400; MIME distinto de application/pdf: 415; tamaño superior a PDF_MAX_FILE_SIZE_MB: 413. El archivo se cifra como JWE y sube a S3 antes de extraer. Comprobar MIME no equivale a inspeccionar todo el contenido.
 
-## Projects (Kanban)
+3. OPEN_SOURCE_IA=true selecciona Ollama; en otro caso LLM_PROVIDER elige openai (predeterminado), gemini/google o claude. Usa adaptadores HTTP, no requiere SDK Gemini. Proveedores validan un contrato común; Ollama convierte PDF a imagen. Modelo/endpoint vienen de configuración. ROLLBACK_ON_INVOICE_FAILURE se lee/registra pero no desactiva la limpieza S3 del caso de uso actual.
 
-Columnas opcionales:
+4. Extracción válida → cálculo → transacción Prisma guarda Invoice SUCCESS, InvoiceMetrics y StoredDocument → AuditLog SUCCESS → respuesta con invoiceId, documentId, extraction y metrics. Consumo suma kWh eléctricos y SCEEE; compensada usa GD I; totalSinGD suma electricidad, SCEEE e iluminación; ahorro usa el valor GD I. No convierte automáticamente el ahorro a valor absoluto.
 
-| Columna | Significado |
-|---------|-------------|
-| Backlog | Sin iniciar |
-| En curso | Asignado y activo |
-| Revisión | PR abierto |
-| Hecho | Merge y verificación |
+5. Un fallo dentro de extracción/persistencia intenta eliminar S3, audita error y propaga excepción. Fallo al eliminar registra warning. El upload inicial ocurre antes del bloque; fallo de auditoría después del commit puede dejar registros sin objeto. Existen enums PROCESSING/ERROR, pero no se crea una factura por cada intento fallido.
 
-## Lista de validación (antes de entregar)
+## Archivos relacionados
 
-- [ ] `GET /api/health` OK con el stack en marcha.
-- [ ] Swagger accesible y flujos de auth probables (`/api/docs/en` o `/api/docs/pt`).
-- [ ] Frontend en `http://localhost:3001` (valores por defecto Docker).
-- [ ] Subida de PDF → extracción completada y datos en la UI o BD.
-- [ ] Rutas admin vs usuario respetan RBAC (`ADMIN` / `USER`).
-- [ ] Evidencia: grabación corta o capturas + enlaces de Issue/PR.
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Vídeo de ejecución
+## Navegación
 
-La ruta **vídeo** de este sitio apunta al vídeo oficial de ejecución del proyecto (YouTube).
-
-> Versión: 1.0.0
+- [Project guide](?menu=es&lang=es&id=19)
+- [Source reference](?menu=es&lang=es&id=20)

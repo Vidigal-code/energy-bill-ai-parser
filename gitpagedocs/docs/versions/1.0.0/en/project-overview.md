@@ -1,64 +1,66 @@
 # Project overview
 
-**energy-bill-ai-parser** is a full-stack platform to upload energy-bill PDFs, extract structured data with **multiple LLM providers**, and expose dashboards and admin flows with **JWT authentication**, **RBAC** (`ADMIN` / `USER`), **audit logs**, and **encrypted storage** (JWE + S3-compatible backend).
+Accepts energy-bill PDFs, extracts structured fields through a multimodal provider, calculates metrics and exposes listings, dashboards, documents and administration. Compare results with the original PDF; schema validation does not prove that values were read correctly.
 
-## Goals
+## Implemented behavior
 
-- Accept PDF uploads and send them to an LLM (vision/document) pipeline per your extraction contract.
-- Persist structured results and business metrics in **PostgreSQL** via **Prisma**.
-- Provide a **Next.js** UI aligned with backend roles and APIs.
-- Keep security and observability consistent (Helmet, throttling, structured logging).
+TypeScript/NestJS 11 with Prisma 6.4/PostgreSQL, Passport/JWT, Argon2, Zod, S3 and JWE; Next.js 16.1.6/React 19.2.3 frontend with Redux Toolkit and TanStack Query. auth, invoices, llm, storage, audit, admin and health separate presentation, application and contracts. The use case depends on ILlmExtractor and DocumentStoragePort. Processing is synchronous within the request; this flow has no extraction queue.
 
-## Stack
+```mermaid
+sequenceDiagram
+  participant UI as Frontend
+  participant API as Extraction use case
+  participant S3 as Encrypted storage
+  participant LLM as Selected provider
+  participant DB as PostgreSQL
+  UI->>API: Multipart PDF and authentication
+  API->>S3: Upload JWE
+  API->>LLM: Original PDF or images
+  LLM-->>API: Validated extraction
+  API->>DB: Transaction: invoice, metrics, document
+  API->>DB: Audit
+  API-->>UI: IDs, extraction, metrics
+```
 
-| Layer | Technology |
-|-------|------------|
-| API | NestJS, TypeScript |
-| Web | Next.js (App Router), React, Redux Toolkit, React Query, Tailwind |
-| Data | PostgreSQL, Prisma ORM |
-| AI | Gemini, OpenAI, Claude, Ollama (dynamic provider selection) |
-| Storage | S3-compatible API; **LocalStack** locally |
-| Crypto | JWE for sensitive payloads at rest |
+## Workflow and failure cases
 
-## Repository layout (high level)
+1. Login/registration → access and refresh tokens → JwtAuthGuard/RolesGuard. USER queries its uploaderUserId data; ADMIN has administrative queries. RefreshToken stores hash, jti, expiry, revocation and replacement; refresh is not stateless. The controller inventory lists actual routes.
 
-- `backend/` – NestJS modules, Prisma schema, extraction contracts.
-- `frontend/` – Next.js app (FSD-style: `app`, `shared`, `entities`, `features`, `widgets`).
-- `docker-compose.yml` – Postgres, app services, optional LocalStack.
-- `gitpagedocs/` – This documentation site (Git Page Docs).
+2. POST /api/invoices/extract accepts multipart field file. Missing file returns 400, non-application/pdf MIME 415 and size above PDF_MAX_FILE_SIZE_MB 413. The file is encrypted as JWE and uploaded to S3 before extraction. The use case's MIME check is not complete content inspection.
 
-## Backend modules (conceptual)
+3. OPEN_SOURCE_IA=true selects Ollama; otherwise LLM_PROVIDER selects openai (default), gemini/google or claude. The module uses HTTP adapters, not a required Gemini SDK. Providers validate output against a shared contract; Ollama converts PDF to images. Model/endpoint come from configuration. ROLLBACK_ON_INVOICE_FAILURE is read/logged by the module but does not disable S3 cleanup in the current use case.
 
-| Module | Responsibility |
-|--------|------------------|
-| `auth` | Register, login, refresh, logout, profile, guards |
-| `invoices` | Upload, extraction orchestration, dashboards, role-scoped listing |
-| `llm` | Provider selection and per-provider adapters |
-| `storage` | JWE encryption and S3 operations |
-| `admin` | Administrative CRUD and operational views |
-| `audit` | Audit trail persistence |
-| `shared` | Config, logging, filters, standardized HTTP responses, messages |
+4. Valid extraction → calculation → Prisma transaction writes SUCCESS Invoice, InvoiceMetrics and StoredDocument → SUCCESS AuditLog → response with invoiceId, documentId, extraction and metrics. Consumption sums electricity and SCEEE kWh; compensated energy uses GD I; totalWithoutGD sums electricity, SCEEE and lighting amounts; savings uses the GD I amount. Savings are not automatically converted to an absolute value.
 
-## Extraction contract
+5. Failure inside extraction/persistence attempts S3 removal, writes an error audit and propagates the exception. Removal failure logs a warning. Initial upload occurs before that block; audit failure after commit can leave persisted records with a removed object. PROCESSING/ERROR enums exist, but this use case does not create an invoice row for every failed attempt.
 
-Business rules and field expectations are centralized in the contract under:
+## Configuration and deployment
 
-- `backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts`
+Copy envexample.txt to .env; configure DATABASE_URL, provider/model, its key, S3 and encryption. Compose starts PostgreSQL, LocalStack, backend/frontend; optional Ollama configuration is commented out, so do not assume it starts. Ollama needs Dockerfile rasterization dependencies and a vision model. Backend has test:unit/test:integration, lint/build; frontend has lint/build. For 503 check provider/key; for rejected PDFs check format/size; for empty dashboards check user/filters/persistence. Actual endpoints include dashboard/consolidated, energy, financial and my-documents.
 
-Prompts and reference material are driven by environment variables such as:
+## Execution commands
 
-- `INVOICE_EXTRACTION_REFERENCE`
-- `INVOICE_EXTRACTION_PROMPT`
-- `INVOICE_EXTRACTION_CONTEXT`
+```sh
+docker compose up --build
+# Validation in a separately configured test environment
+npm --prefix backend ci
+npm --prefix backend run test:unit
+npm --prefix backend run test:integration
+npm --prefix backend run build
+npm --prefix frontend ci
+npm --prefix frontend run build
+```
 
-## Security model
+## Related files
 
-- Global JWT authentication on protected routes (public auth/health routes excluded).
-- **RBAC**: `ADMIN` vs `USER` for admin vs standard flows.
-- **Helmet** for HTTP headers; **rate limiting** (Throttler) globally.
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Frontend session
+## Navigation
 
-The browser talks to Next.js route handlers that proxy cookies / session to the backend (HTTP-only cookies), not raw tokens in `localStorage` for session management.
-
-> Version: 1.0.0
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

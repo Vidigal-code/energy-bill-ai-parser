@@ -1,20 +1,181 @@
-# Relational Database Schema (Prisma)
+# Database Schema
 
-Structural integrity of financial and operational persistence is guaranteed via a PostgreSQL relational database, cleanly orchestrated by the Prisma ORM tool.
+Accepts energy-bill PDFs, extracts structured fields through a multimodal provider, calculates metrics and exposes listings, dashboards, documents and administration. Compare results with the original PDF; schema validation does not prove that values were read correctly.
 
-## Key Prisma Entities
+## Data contracts
 
-### `User`
-Maintains safe-hashed auth records alongside authorization levels.
-- **Relationships:** `1-N` towards Invoices (One user issues many invoices). `1-N` relative to Auditlogs.
-- **Notable Fields:** `passwordHash`, `role` (`ADMIN` or `USER`), `refreshToken`.
+Invoice links uploader, Decimal/JSON extracted fields and metrics; StoredDocument stores bucket/key, checksum, size and optional invoice; AuditLog stores actor/action/status. Queries filter user and role. Protect LLM/encryption keys and back up encryption keys for recovery. S3 encryption at rest does not prevent the original PDF from reaching the selected provider. UI local state is separate from query cache; the backend determines authorization/values.
 
-### Billing Core Models
-These schemas save invoice tracking links mapping directly to S3 Buckets, alongside AI Extracted payloads.
+### Role
 
-- **`Invoice`**: Validates the physical existence of a file uploaded online, recording the UUID keys needed to securely decrypt/fetch the payload from Cloud Object Storage architectures.
-- **`InvoiceExtractedData`**: A strict `1-1` relational table attached to `Invoice` saving the raw deterministic metrics from LLM responses: `numeroCliente`, `consumoEnergiaEletricaKwh`, and values. Emitting this into a flat-table matrix empowers incredibly fast frontend analytical dashboards and sorting paradigms.
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
 
-### `AuditLog`
-The security non-repudiation ledger mechanism. Any write action of significant impact logs a snapshot within this table.
-- **Notable Fields:** `action`, `resource`, `ipAddress`, `operatorId`.
+| Field | Type / constraint |
+| --- | --- |
+| `ADMIN` | `` |
+| `USER` | `` |
+
+### InvoiceStatus
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `PROCESSING` | `` |
+| `SUCCESS` | `` |
+| `ERROR` | `` |
+
+### AuditStatus
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `SUCCESS` | `` |
+| `ERROR` | `` |
+
+### User
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `id` | `String          @id @default(cuid())` |
+| `email` | `String          @unique` |
+| `username` | `String          @unique` |
+| `passwordHash` | `String` |
+| `role` | `Role            @default(USER)` |
+| `isActive` | `Boolean         @default(true)` |
+| `createdAt` | `DateTime        @default(now())` |
+| `updatedAt` | `DateTime        @updatedAt` |
+| `refreshTokens` | `RefreshToken[]` |
+| `invoices` | `Invoice[]` |
+| `auditLogs` | `AuditLog[]` |
+| `storedDocuments` | `StoredDocument[] @relation("UploaderDocuments")` |
+
+### RefreshToken
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `id` | `String   @id @default(cuid())` |
+| `userId` | `String` |
+| `tokenHash` | `String` |
+| `jti` | `String   @unique` |
+| `expiresAt` | `DateTime` |
+| `revokedAt` | `DateTime?` |
+| `replacedByTokenId` | `String?` |
+| `userAgent` | `String?` |
+| `ip` | `String?` |
+| `createdAt` | `DateTime @default(now())` |
+| `user` | `User     @relation(fields: [userId], references: [id], onDelete: Cascade)` |
+| `@@index([userId])` | `` |
+
+### Invoice
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `id` | `String         @id @default(cuid())` |
+| `uploaderUserId` | `String` |
+| `fileName` | `String` |
+| `status` | `InvoiceStatus  @default(PROCESSING)` |
+| `errorMessage` | `String?` |
+| `numeroCliente` | `String` |
+| `mesReferencia` | `String` |
+| `energiaEletricaQuantidadeKwh` | `Decimal        @db.Decimal(14, 3)` |
+| `energiaEletricaValorRs` | `Decimal        @db.Decimal(14, 2)` |
+| `energiaSceeSemIcmsQuantidadeKwh` | `Decimal        @db.Decimal(14, 3)` |
+| `energiaSceeSemIcmsValorRs` | `Decimal        @db.Decimal(14, 2)` |
+| `energiaCompensadaGdiQuantidadeKwh` | `Decimal        @db.Decimal(14, 3)` |
+| `energiaCompensadaGdiValorRs` | `Decimal        @db.Decimal(14, 2)` |
+| `contribIlumPublicaMunicipalValorRs` | `Decimal        @db.Decimal(14, 2)` |
+| `extractionProvider` | `String` |
+| `rawExtractionJson` | `Json` |
+| `createdAt` | `DateTime       @default(now())` |
+| `updatedAt` | `DateTime       @updatedAt` |
+| `metrics` | `InvoiceMetrics?` |
+| `uploader` | `User           @relation(fields: [uploaderUserId], references: [id], onDelete: Restrict)` |
+| `documents` | `StoredDocument[]` |
+| `@@index([uploaderUserId])` | `` |
+| `@@index([numeroCliente])` | `` |
+| `@@index([mesReferencia])` | `` |
+| `@@index([status])` | `` |
+
+### InvoiceMetrics
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `id` | `String   @id @default(cuid())` |
+| `invoiceId` | `String   @unique` |
+| `consumoEnergiaEletricaKwh` | `Decimal  @db.Decimal(14, 3)` |
+| `energiaCompensadaKwh` | `Decimal  @db.Decimal(14, 3)` |
+| `valorTotalSemGdRs` | `Decimal  @db.Decimal(14, 2)` |
+| `economiaGdRs` | `Decimal  @db.Decimal(14, 2)` |
+| `createdAt` | `DateTime @default(now())` |
+| `updatedAt` | `DateTime @updatedAt` |
+| `invoice` | `Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)` |
+
+### StoredDocument
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `id` | `String   @id @default(cuid())` |
+| `invoiceId` | `String?` |
+| `uploaderUserId` | `String` |
+| `bucket` | `String` |
+| `objectKey` | `String   @unique` |
+| `fileName` | `String` |
+| `mimeType` | `String` |
+| `sizeBytes` | `Int` |
+| `checksum` | `String` |
+| `createdAt` | `DateTime @default(now())` |
+| `updatedAt` | `DateTime @updatedAt` |
+| `invoice` | `Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)` |
+| `uploader` | `User     @relation("UploaderDocuments", fields: [uploaderUserId], references: [id], onDelete: Restrict)` |
+| `@@index([uploaderUserId])` | `` |
+| `@@index([invoiceId])` | `` |
+| `@@index([createdAt])` | `` |
+
+### AuditLog
+
+[backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+
+| Field | Type / constraint |
+| --- | --- |
+| `id` | `String      @id @default(cuid())` |
+| `actorUserId` | `String?` |
+| `action` | `String` |
+| `resourceType` | `String` |
+| `resourceId` | `String?` |
+| `status` | `AuditStatus @default(SUCCESS)` |
+| `message` | `String` |
+| `meta` | `Json?` |
+| `ip` | `String?` |
+| `userAgent` | `String?` |
+| `createdAt` | `DateTime    @default(now())` |
+| `actor` | `User?       @relation(fields: [actorUserId], references: [id], onDelete: SetNull)` |
+| `@@index([actorUserId])` | `` |
+| `@@index([action])` | `` |
+| `@@index([resourceType])` | `` |
+| `@@index([createdAt])` | `` |
+
+## Related files
+
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
+
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)

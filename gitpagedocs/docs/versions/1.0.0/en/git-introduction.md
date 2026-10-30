@@ -1,53 +1,29 @@
 # Architecture and infrastructure
 
-Deep dive into how **energy-bill-ai-parser** is structured and how services interact.
+Accepts energy-bill PDFs, extracts structured fields through a multimodal provider, calculates metrics and exposes listings, dashboards, documents and administration. Compare results with the original PDF; schema validation does not prove that values were read correctly.
 
-## Monorepo
+## Workflow and failure cases
 
-- **Backend** (`backend/`): NestJS application, modular boundaries.
-- **Frontend** (`frontend/`): Next.js App Router, feature-sliced structure.
-- **Infra** (`docker-compose.yml`): Postgres, optional LocalStack, app containers.
+1. Login/registration → access and refresh tokens → JwtAuthGuard/RolesGuard. USER queries its uploaderUserId data; ADMIN has administrative queries. RefreshToken stores hash, jti, expiry, revocation and replacement; refresh is not stateless. The controller inventory lists actual routes.
 
-## Backend layering
+2. POST /api/invoices/extract accepts multipart field file. Missing file returns 400, non-application/pdf MIME 415 and size above PDF_MAX_FILE_SIZE_MB 413. The file is encrypted as JWE and uploaded to S3 before extraction. The use case's MIME check is not complete content inspection.
 
-- **Presentation**: controllers, DTOs, guards, pipes.
-- **Application / domain**: use cases, invoice extraction contract, domain errors.
-- **Infrastructure**: Prisma, S3 client, LLM adapters, external integrations.
+3. OPEN_SOURCE_IA=true selects Ollama; otherwise LLM_PROVIDER selects openai (default), gemini/google or claude. The module uses HTTP adapters, not a required Gemini SDK. Providers validate output against a shared contract; Ollama converts PDF to images. Model/endpoint come from configuration. ROLLBACK_ON_INVOICE_FAILURE is read/logged by the module but does not disable S3 cleanup in the current use case.
 
-Key shared cross-cutting concerns live in `backend/src/shared` (config, logging, filters).
+4. Valid extraction → calculation → Prisma transaction writes SUCCESS Invoice, InvoiceMetrics and StoredDocument → SUCCESS AuditLog → response with invoiceId, documentId, extraction and metrics. Consumption sums electricity and SCEEE kWh; compensated energy uses GD I; totalWithoutGD sums electricity, SCEEE and lighting amounts; savings uses the GD I amount. Savings are not automatically converted to an absolute value.
 
-## Frontend layering
+5. Failure inside extraction/persistence attempts S3 removal, writes an error audit and propagates the exception. Removal failure logs a warning. Initial upload occurs before that block; audit failure after commit can leave persisted records with a removed object. PROCESSING/ERROR enums exist, but this use case does not create an invoice row for every failed attempt.
 
-- **`app/`**: routes, layouts, server/client boundaries.
-- **`entities/`**, **`features/`**, **`widgets/`**: UI composition and state (Redux Toolkit + React Query for server state).
+## Related files
 
-Session is handled via **Next.js** routes and **HTTP-only cookies** toward the API.
+- [backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/application/process-invoice-extraction.use-case.ts)
+- [backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/domain/contracts/invoice-extraction.contract.ts)
+- [backend/src/modules/llm/llm.module.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/llm/llm.module.ts)
+- [backend/src/modules/invoices/presentation/invoices.controller.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/src/modules/invoices/presentation/invoices.controller.ts)
+- [backend/prisma/schema.prisma](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/prisma/schema.prisma)
+- [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Docker Compose services
+## Navigation
 
-Typical services:
-
-- **postgres** – primary database.
-- **backend** – NestJS API.
-- **frontend** – Next.js.
-- **localstack** (if enabled) – S3 API compatibility.
-
-Ports and env vars are documented in `docker-compose.yml` and `envexample.txt`.
-
-## LLM execution notes
-
-- **Gemini** (default in many setups) accepts PDF **directly** via multimodal API, matching the “no pre-extraction text pipeline” requirement.
-- **Ollama** may require **image conversion** from PDF pages for vision models that do not support the PDF MIME type.
-
-## Observability
-
-- Structured logging (no raw `console` in production paths).
-- Centralized messages for user-facing errors (PT-BR in `backend/src/shared/messages/pt-br.messages.ts`).
-
-## Security and network
-
-- **Helmet** for HTTP headers.
-- **Throttler** for global rate limiting.
-- **CORS** and cookie settings aligned with frontend origin.
-
-> Version: 1.0.0
+- [Project guide](?menu=en&lang=en&id=19)
+- [Source reference](?menu=en&lang=en&id=20)
