@@ -60,7 +60,13 @@
         "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
         "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
       },
-      "fullscreenEnabled": true
+      "fullscreenEnabled": true,
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 20,
@@ -74,7 +80,13 @@
         "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
         "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
       },
-      "fullscreenEnabled": true
+      "fullscreenEnabled": true,
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 1,
@@ -111,7 +123,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 2,
@@ -148,7 +165,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 3,
@@ -185,7 +207,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 4,
@@ -222,7 +249,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 5,
@@ -259,7 +291,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 6,
@@ -309,7 +346,12 @@
           "firebase",
           "jwt"
         ]
-      }
+      },
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 7,
@@ -346,7 +388,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 8,
@@ -383,7 +430,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 9,
@@ -420,7 +472,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 10,
@@ -457,7 +514,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 11,
@@ -494,7 +556,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 12,
@@ -531,7 +598,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 13,
@@ -568,7 +640,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 14,
@@ -605,7 +682,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 15,
@@ -642,7 +724,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 16,
@@ -679,7 +766,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 17,
@@ -716,7 +808,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 18,
@@ -753,7 +850,12 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false
+      "RouteguideBrandContainerTop": false,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     }
   ],
   "routes-html": [],

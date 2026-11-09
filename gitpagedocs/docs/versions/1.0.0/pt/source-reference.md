@@ -2,7 +2,7 @@
 
 Inventário extraído dos manifests e das declarações do código. Versões com `^` ou `~` são intervalos declarados; o lockfile determina a versão resolvida.
 
-Commit: `00154f885896b294707fbf12ef0701a3d62630cd`. GitPageDocs: `0.0.17`.
+Commit: `00154f885896b294707fbf12ef0701a3d62630cd`. GitPageDocs: `0.0.23`.
 
 ## Dependências e ferramentas
 
@@ -212,3 +212,19 @@ Nomes extraídos apenas dos arquivos de exemplo e das referências a variáveis 
 - [backend/tests/unit/invoice-extraction.contract.spec.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/tests/unit/invoice-extraction.contract.spec.ts)
 - [backend/tests/unit/mes-referencia.util.spec.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/tests/unit/mes-referencia.util.spec.ts)
 - [backend/tests/unit/pdf-upload.config.spec.ts](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/backend/tests/unit/pdf-upload.config.spec.ts)
+
+## Manutenção da documentação e MCP local
+
+O conteúdo funcional acima descreve este projeto. A configuração do visualizador acompanha o GitPageDocs **0.0.23**; ela não altera a versão da aplicação nem o diretório documental `1.0.0`.
+
+Com `@gitpagedocs/cli` 0.0.23 instalado, execute na raiz deste repositório:
+
+```sh
+gitpagedocs mcp start
+```
+
+O cliente MCP inicia um processo stdio; não há porta HTTP nem opção `--cwd`. Configure o diretório de trabalho do processo como a raiz do projeto. `list_files`, `read_file` e os recursos `project://readme` e `project://structure` permitem inspecionar o conteúdo sem provedor externo. `write_file` grava o conteúdo completo do arquivo indicado, após revisão.
+
+`update_documentation` chama um provedor e só substitui a região entre `gitpagedocs:start` e `gitpagedocs:end`; sem os marcadores, acrescenta uma região. Não use esse fluxo para substituir automaticamente estas páginas completas. `validate_docs` é uma revisão por provedor, não uma verificação determinística de todos os links. O comando `gitpagedocs docs` atualiza regiões de README/CONTRIBUTING/SECURITY com conteúdo padrão do GitPageDocs; não atualiza estas páginas específicas.
+
+Antes de publicar, valide o JSON, os caminhos de todos os idiomas, o índice e os links no visualizador. A publicação usa o workflow do repositório; o pin do runtime precisa ser atualizado separadamente para uma release disponível. Preserve os menus, temas, ícones, caminhos públicos e a versão documental existentes.
