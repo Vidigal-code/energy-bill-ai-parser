@@ -1,6 +1,6 @@
 # energy-bill-ai-parser: Contexto e fluxos do projeto
 
-GitPageDocs **0.0.26** · 1.0.0 · 2026-11-08
+GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
 
 ## Contexto
 
@@ -64,9 +64,9 @@ Dependências, comandos, endpoints, variáveis, contratos e testes estão na [re
 
 - [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Navegação da documentação com GitPageDocs 0.0.26
+## Navegação da documentação com GitPageDocs 0.0.29
 
-As opções desta seção requerem o runtime GitPageDocs **0.0.26**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
+Este guia descreve o runtime GitPageDocs **0.0.29**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
 
 ### Índice por tags
 
@@ -88,7 +88,7 @@ Com a rolagem do índice desbloqueada, o item ativo é centralizado, inclusive a
 
 Ao validar em celular, confira o menu recolhido, alvos de toque, foco por teclado, tabelas e blocos de código com rolagem horizontal. Em dispositivos dobráveis, repita a navegação com a tela dobrada e aberta, nas duas orientações, e confirme que o item ativo permanece acessível após a mudança de largura. Use o controle de pausa quando houver efeitos animados e respeite a preferência de movimento reduzido.
 
-O GitPageDocs 0.0.26 usa `performance.mode: "auto"` nos efeitos dos temas: reduz moderadamente a densidade no desktop e usa um orçamento menor abaixo de 768px, mantendo as camadas do tema. Partículas ocultas ficam pausadas e retomam a mesma fase ao mudar a largura. Para manter a densidade completa, mescle `site.backgroundEffects.overrides.performance: { "mode": "full" }` em `gitpagedocs/config.json`; a mesma opção pode ser definida em `site.backgroundEffects.themes[themeId].performance`. Um override explícito de `layers` mantém a contagem completa quando não há mode definido nos overrides. Use `"auto"` explicitamente para aplicar o orçamento também às camadas personalizadas.
+O GitPageDocs 0.0.29 usa `performance.mode: "auto"` nos efeitos dos temas: reduz moderadamente a densidade no desktop e usa um orçamento menor abaixo de 768px, mantendo as camadas do tema. Partículas ocultas ficam pausadas e retomam a mesma fase ao mudar a largura. Para manter a densidade completa, mescle `site.backgroundEffects.overrides.performance: { "mode": "full" }` em `gitpagedocs/config.json`; a mesma opção pode ser definida em `site.backgroundEffects.themes[themeId].performance`. Um override explícito de `layers` mantém a contagem completa quando não há mode definido nos overrides. Use `"auto"` explicitamente para aplicar o orçamento também às camadas personalizadas.
 
 ## Família de tema fixa e modo claro/escuro
 
@@ -101,3 +101,13 @@ As duas entradas do catálogo de layouts devem habilitar `supportsLightAndDarkMo
 ## Altura do guia lateral desktop
 
 Em telas desktop com mais de 1024 pixels CSS, o guia lateral termina após o último item, sem se estender até o fim do artigo. Desde a 0.0.25, ele pode crescer até a altura disponível da janela abaixo do cabeçalho antes de precisar de rolagem interna. Esse layout lateral tem prioridade sobre `TocScrollMaxHeightDesktop`; o guia centralizado acima do conteúdo e os layouts de até 1024 pixels mantêm suas regras anteriores de dimensionamento. Uma pequena barra na cor do item ativo acompanha a seção marcada durante a rolagem. O indicador usa o acompanhamento de seções existente, sem animação contínua. No GitPageDocs 0.0.26, os guias laterais ganham mais 0.5rem de espaço abaixo do cabeçalho (8px com a fonte raiz padrão) e mantêm 1rem abaixo do cartão no limite da viewport. Esse ajuste vale somente acima de 1024 pixels CSS; os layouts menores são preservados.
+
+## Leitura e controles no GitPageDocs 0.0.29
+
+- **0.0.27 — código-fonte:** quando há um contêiner Source code configurado, listas longas de arquivos e prévias rolam dentro dele, limitado à altura disponível da janela. A atualização do runtime não adiciona essa rota automaticamente.
+- **0.0.28 — guia do documento:** o espaço entre os itens e a barra de rolagem é de 1.5rem (24 pixels CSS com a fonte raiz padrão). Em Chromium/WebKit compatíveis, a barra lateral tem 4px, trilho transparente e indicador discreto na cor do tema; outros navegadores usam a barra fina nativa, conforme suporte e preferências de acessibilidade.
+- **0.0.29 — navegação do Markdown:** Anterior, Próximo e Voltar ao topo ficam dentro do contêiner, após o conteúdo, com 8px de separação no fluxo normal. O texto, tabelas e demais elementos não ficam cobertos. Os controles seguem o padrão visual de copiar/baixar: 36 × 36px no desktop, 6px entre botões e altura mínima de 44px em dispositivos com ponteiro de toque. O botão de topo continua condicionado às opções de `site.backToTop` e à altura da página.
+
+O alinhamento continua configurável em `gitpagedocs/config.json`, por `site.documentNavigation.position`: `left`, `center` ou `right`. Este projeto mantém `center`. O modo foco usa o olho enquadrado `LuScanEye`, distinto de tela cheia; o rótulo acessível permanece disponível e ícones personalizados continuam aceitos em `site.icons.FocusMode`.
+
+Ao validar, abra documentos longos e curtos, navegue até o primeiro e o último, confira os limites desabilitados e use Tab/Enter para voltar ao topo. Repita em desktop e tela de toque, nos três alinhamentos. A versão dos documentos da aplicação continua `1.0.0`.

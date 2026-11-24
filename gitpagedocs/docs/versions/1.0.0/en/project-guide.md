@@ -1,6 +1,6 @@
 # energy-bill-ai-parser: Project context and workflows
 
-GitPageDocs **0.0.26** · 1.0.0 · 2026-11-08
+GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
 
 ## Context
 
@@ -64,9 +64,9 @@ Dependencies, commands, endpoints, variables, contracts and tests are in the [so
 
 - [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Documentation navigation with GitPageDocs 0.0.26
+## Documentation navigation with GitPageDocs 0.0.29
 
-The options in this section require the GitPageDocs **0.0.26** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
+This guide describes the GitPageDocs **0.0.29** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
 
 ### Tag-based contents
 
@@ -88,7 +88,7 @@ With contents scrolling unlocked, the active entry is centered, including naviga
 
 When validating on a phone, check the collapsed menu, touch targets, keyboard focus, tables and horizontally scrollable code blocks. On foldable devices, repeat navigation folded and unfolded, in both orientations, and confirm the active entry remains accessible after the width changes. Use the pause control when animated effects are present and respect reduced-motion preferences.
 
-GitPageDocs 0.0.26 uses `performance.mode: "auto"` for theme effects: it moderately reduces density on desktop and uses a smaller budget below 768px while retaining the theme's layers. Hidden particles pause and resume the same phase when the width changes. To keep full density, merge `site.backgroundEffects.overrides.performance: { "mode": "full" }` into `gitpagedocs/config.json`; the same option is available in `site.backgroundEffects.themes[themeId].performance`. An explicit `layers` override keeps the complete count when no mode is set in the overrides. Select `"auto"` explicitly to apply the budget to custom layers too.
+GitPageDocs 0.0.29 uses `performance.mode: "auto"` for theme effects: it moderately reduces density on desktop and uses a smaller budget below 768px while retaining the theme's layers. Hidden particles pause and resume the same phase when the width changes. To keep full density, merge `site.backgroundEffects.overrides.performance: { "mode": "full" }` into `gitpagedocs/config.json`; the same option is available in `site.backgroundEffects.themes[themeId].performance`. An explicit `layers` override keeps the complete count when no mode is set in the overrides. Select `"auto"` explicitly to apply the budget to custom layers too.
 
 ## Fixed theme family and light/dark mode
 
@@ -101,3 +101,13 @@ Both entries in the layout catalog must enable `supportsLightAndDarkModes`, shar
 ## Desktop side-guide height
 
 On desktop screens wider than 1024 CSS pixels, the side guide ends after its last entry instead of stretching to the article height. Since 0.0.25, it can grow to the available viewport height below the header before its entries need internal scrolling. This side layout takes precedence over `TocScrollMaxHeightDesktop`; centered guides above the content and layouts at 1024 pixels and below retain their previous sizing rules. A small bar in the active entry's theme color follows the section marked while scrolling. The indicator uses the existing section tracking without continuous animation. In GitPageDocs 0.0.26, side guides have an extra 0.5rem of space below the header (8px at the default root font size) and retain 1rem below the card at the viewport limit. This adjustment applies only above 1024 CSS pixels; smaller layouts are unchanged.
+
+## Reading and controls in GitPageDocs 0.0.29
+
+- **0.0.27 — source code:** when a Source code container is configured, long file lists and previews scroll inside it, bounded by the available viewport height. Updating the runtime does not add that route automatically.
+- **0.0.28 — document guide:** the space between entries and the scrollbar is 1.5rem (24 CSS pixels at the default root font size). Supporting Chromium/WebKit browsers use a 4px side-guide scrollbar with a transparent track and a subtle theme-colored thumb; other browsers use their native thin scrollbar according to support and accessibility preferences.
+- **0.0.29 — Markdown navigation:** Previous, Next and Back to top sit inside the container after its content, with an 8px gap in normal flow. Text, tables and other elements remain unobstructed. Controls match the copy/download styling: 36 × 36px on desktop, 6px between buttons and a minimum height of 44px on devices with a coarse touch pointer. Back to top still follows `site.backToTop` settings and the page-height threshold.
+
+Alignment remains configurable in `gitpagedocs/config.json` through `site.documentNavigation.position`: `left`, `center` or `right`. This project keeps `center`. Focus mode uses the framed eye `LuScanEye`, distinct from fullscreen; its accessible label remains available and custom icons are still supported through `site.icons.FocusMode`.
+
+When validating, open long and short documents, navigate to the first and last, check disabled boundaries and use Tab/Enter to return to the top. Repeat on desktop and touch screens with all three alignments. The application documentation version remains `1.0.0`.
