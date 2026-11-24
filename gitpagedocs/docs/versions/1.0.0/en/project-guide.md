@@ -1,6 +1,6 @@
 # energy-bill-ai-parser: Project context and workflows
 
-GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
+GitPageDocs **0.0.30** · 1.0.0 · 2026-11-24
 
 ## Context
 
@@ -64,9 +64,9 @@ Dependencies, commands, endpoints, variables, contracts and tests are in the [so
 
 - [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Documentation navigation with GitPageDocs 0.0.29
+## Documentation navigation with GitPageDocs 0.0.30
 
-This guide describes the GitPageDocs **0.0.29** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
+This guide describes the GitPageDocs **0.0.30** runtime. This project's documentation version remains **1.0.0**. Updating text and configuration does not itself update the runtime deployed by the workflow.
 
 ### Tag-based contents
 
@@ -88,7 +88,7 @@ With contents scrolling unlocked, the active entry is centered, including naviga
 
 When validating on a phone, check the collapsed menu, touch targets, keyboard focus, tables and horizontally scrollable code blocks. On foldable devices, repeat navigation folded and unfolded, in both orientations, and confirm the active entry remains accessible after the width changes. Use the pause control when animated effects are present and respect reduced-motion preferences.
 
-GitPageDocs 0.0.29 uses `performance.mode: "auto"` for theme effects: it moderately reduces density on desktop and uses a smaller budget below 768px while retaining the theme's layers. Hidden particles pause and resume the same phase when the width changes. To keep full density, merge `site.backgroundEffects.overrides.performance: { "mode": "full" }` into `gitpagedocs/config.json`; the same option is available in `site.backgroundEffects.themes[themeId].performance`. An explicit `layers` override keeps the complete count when no mode is set in the overrides. Select `"auto"` explicitly to apply the budget to custom layers too.
+GitPageDocs 0.0.30 uses `performance.mode: "auto"` for theme effects: it moderately reduces density on desktop and uses a smaller budget below 768px while retaining the theme's layers. Hidden particles pause and resume the same phase when the width changes. To keep full density, merge `site.backgroundEffects.overrides.performance: { "mode": "full" }` into `gitpagedocs/config.json`; the same option is available in `site.backgroundEffects.themes[themeId].performance`. An explicit `layers` override keeps the complete count when no mode is set in the overrides. Select `"auto"` explicitly to apply the budget to custom layers too.
 
 ## Fixed theme family and light/dark mode
 
@@ -111,3 +111,11 @@ On desktop screens wider than 1024 CSS pixels, the side guide ends after its las
 Alignment remains configurable in `gitpagedocs/config.json` through `site.documentNavigation.position`: `left`, `center` or `right`. This project keeps `center`. Focus mode uses the framed eye `LuScanEye`, distinct from fullscreen; its accessible label remains available and custom icons are still supported through `site.icons.FocusMode`.
 
 When validating, open long and short documents, navigate to the first and last, check disabled boundaries and use Tab/Enter to return to the top. Repeat on desktop and touch screens with all three alignments. The application documentation version remains `1.0.0`.
+
+## Source files and tree navigation in GitPageDocs 0.0.30
+
+Since 0.0.30, Source code recognizes UTF-16LE and UTF-16BE files by their byte-order mark (BOM). The viewer removes the initial mark and preserves accents, non-Latin text and emoji. Files without a UTF-16 BOM continue through UTF-8 decoding, including UTF-8 files with a BOM. This fixes displays such as a UTF-16 `.gitignore` without changing the repository file.
+
+The Files tree supports horizontal and vertical scrolling and displays complete file and folder names. Clicking a folder row expands or collapses its children without replacing the open file or changing the current URL. The central directory listing, breadcrumbs and filtered folder results continue to navigate directories. Check long names and deeply nested folders in both scroll directions; repeatedly opening and closing a folder must preserve the selected file and URL.
+
+The viewer does not guess the encoding of UTF-16 files without a BOM or add Source code routes automatically. Where this view is configured, open a valid UTF-16 `.gitignore` through the directory list and check that `node_modules/` is readable. Also check an accented filename or file content, emoji and navigation back to the directory on desktop and mobile. The documentation version remains `1.0.0`.

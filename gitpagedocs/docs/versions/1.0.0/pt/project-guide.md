@@ -1,6 +1,6 @@
 # energy-bill-ai-parser: Contexto e fluxos do projeto
 
-GitPageDocs **0.0.29** · 1.0.0 · 2026-11-23
+GitPageDocs **0.0.30** · 1.0.0 · 2026-11-24
 
 ## Contexto
 
@@ -64,9 +64,9 @@ Dependências, comandos, endpoints, variáveis, contratos e testes estão na [re
 
 - [docker-compose.yml](https://github.com/Vidigal-code/energy-bill-ai-parser/blob/00154f885896b294707fbf12ef0701a3d62630cd/docker-compose.yml)
 
-## Navegação da documentação com GitPageDocs 0.0.29
+## Navegação da documentação com GitPageDocs 0.0.30
 
-Este guia descreve o runtime GitPageDocs **0.0.29**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
+Este guia descreve o runtime GitPageDocs **0.0.30**. A versão documental deste projeto continua **1.0.0**. Atualizar o texto e a configuração não atualiza, por si só, o runtime publicado pelo workflow.
 
 ### Índice por tags
 
@@ -88,7 +88,7 @@ Com a rolagem do índice desbloqueada, o item ativo é centralizado, inclusive a
 
 Ao validar em celular, confira o menu recolhido, alvos de toque, foco por teclado, tabelas e blocos de código com rolagem horizontal. Em dispositivos dobráveis, repita a navegação com a tela dobrada e aberta, nas duas orientações, e confirme que o item ativo permanece acessível após a mudança de largura. Use o controle de pausa quando houver efeitos animados e respeite a preferência de movimento reduzido.
 
-O GitPageDocs 0.0.29 usa `performance.mode: "auto"` nos efeitos dos temas: reduz moderadamente a densidade no desktop e usa um orçamento menor abaixo de 768px, mantendo as camadas do tema. Partículas ocultas ficam pausadas e retomam a mesma fase ao mudar a largura. Para manter a densidade completa, mescle `site.backgroundEffects.overrides.performance: { "mode": "full" }` em `gitpagedocs/config.json`; a mesma opção pode ser definida em `site.backgroundEffects.themes[themeId].performance`. Um override explícito de `layers` mantém a contagem completa quando não há mode definido nos overrides. Use `"auto"` explicitamente para aplicar o orçamento também às camadas personalizadas.
+O GitPageDocs 0.0.30 usa `performance.mode: "auto"` nos efeitos dos temas: reduz moderadamente a densidade no desktop e usa um orçamento menor abaixo de 768px, mantendo as camadas do tema. Partículas ocultas ficam pausadas e retomam a mesma fase ao mudar a largura. Para manter a densidade completa, mescle `site.backgroundEffects.overrides.performance: { "mode": "full" }` em `gitpagedocs/config.json`; a mesma opção pode ser definida em `site.backgroundEffects.themes[themeId].performance`. Um override explícito de `layers` mantém a contagem completa quando não há mode definido nos overrides. Use `"auto"` explicitamente para aplicar o orçamento também às camadas personalizadas.
 
 ## Família de tema fixa e modo claro/escuro
 
@@ -111,3 +111,11 @@ Em telas desktop com mais de 1024 pixels CSS, o guia lateral termina após o úl
 O alinhamento continua configurável em `gitpagedocs/config.json`, por `site.documentNavigation.position`: `left`, `center` ou `right`. Este projeto mantém `center`. O modo foco usa o olho enquadrado `LuScanEye`, distinto de tela cheia; o rótulo acessível permanece disponível e ícones personalizados continuam aceitos em `site.icons.FocusMode`.
 
 Ao validar, abra documentos longos e curtos, navegue até o primeiro e o último, confira os limites desabilitados e use Tab/Enter para voltar ao topo. Repita em desktop e tela de toque, nos três alinhamentos. A versão dos documentos da aplicação continua `1.0.0`.
+
+## Arquivos de código fonte e navegação da árvore no GitPageDocs 0.0.30
+
+Desde a 0.0.30, Código fonte reconhece arquivos UTF-16LE e UTF-16BE pela marca de ordem de bytes (BOM). O visualizador remove a marca inicial e preserva acentos, texto de alfabetos não latinos e emoji. Arquivos sem BOM de UTF-16 continuam sendo decodificados como UTF-8, incluindo arquivos UTF-8 com BOM. Isso corrige a exibição de arquivos como um `.gitignore` em UTF-16 sem alterar o arquivo do repositório.
+
+A árvore de arquivos permite rolagem horizontal e vertical e exibe os nomes completos de arquivos e pastas. Clicar na linha de uma pasta expande ou recolhe seus itens sem trocar o arquivo aberto nem o endereço atual. A listagem central, os caminhos de navegação e os resultados de pastas filtrados continuam permitindo navegar pelos diretórios. Confira nomes longos e pastas com vários níveis nas duas direções de rolagem; abrir e fechar uma pasta repetidamente deve preservar o arquivo selecionado e o endereço.
+
+O visualizador não tenta adivinhar a codificação de arquivos UTF-16 sem BOM nem adiciona rotas de Código fonte automaticamente. Onde essa visualização estiver configurada, abra um `.gitignore` UTF-16 válido pela lista de diretórios e confira se `node_modules/` está legível. Confira também nomes ou conteúdos de arquivo com acentos, emoji e a volta ao diretório no desktop e no celular. A versão documental continua `1.0.0`.
